@@ -1,0 +1,5 @@
+name: YuruCra
+version: 0.0.1
+main: com.github.kotyabuchi.YuruCra.Main
+author: kotyabuchi
+api-version: '1.20'
