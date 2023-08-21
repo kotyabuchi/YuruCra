@@ -1,9 +1,14 @@
 package com.github.kotyabuchi.YuruCra
 
+import com.github.kotyabuchi.MCRPG.DBConnector
+import com.github.kotyabuchi.MCRPG.PlayerManager
 import org.bukkit.event.Listener
 import org.bukkit.plugin.java.JavaPlugin
+import java.io.File
 
 class Main: JavaPlugin() {
+
+    private val dbFile = File(dataFolder, "YuruCra.sqlite")
 
     companion object {
         lateinit var instance: Main
@@ -11,9 +16,11 @@ class Main: JavaPlugin() {
 
     private fun registerEvents() {
         val pm = server.pluginManager
-        val events: List<Listener> = listOf()
+        val events: List<Listener> = listOf(
+            PlayerManager,
+        )
 
-        events.forEach { it ->
+        events.forEach {
             pm.registerEvents(it, this)
             logger.info("イベントリスナーを登録 - ${it.javaClass.name}")
         }
@@ -23,6 +30,10 @@ class Main: JavaPlugin() {
         logger.info("初期化中...")
 
         instance = this
+
+        if (!dataFolder.exists()) dataFolder.mkdirs()
+
+        DBConnector.registerDBFile(dbFile.path).connect()
 
         registerEvents()
 
