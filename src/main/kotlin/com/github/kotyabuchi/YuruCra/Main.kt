@@ -1,7 +1,8 @@
 package com.github.kotyabuchi.YuruCra
 
 import com.github.kotyabuchi.MCRPG.DBConnector
-import com.github.kotyabuchi.MCRPG.PlayerManager
+import com.github.kotyabuchi.YuruCra.Menu.MenuController
+import com.github.kotyabuchi.YuruCra.Player.PlayerManager
 import org.bukkit.event.Listener
 import org.bukkit.plugin.java.JavaPlugin
 import java.io.File
@@ -17,6 +18,8 @@ class Main: JavaPlugin() {
     private fun registerEvents() {
         val pm = server.pluginManager
         val events: List<Listener> = listOf(
+            // Menu
+            MenuController,
             PlayerManager,
         )
 

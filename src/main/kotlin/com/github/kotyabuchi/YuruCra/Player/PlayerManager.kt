@@ -1,8 +1,9 @@
-package com.github.kotyabuchi.MCRPG
+package com.github.kotyabuchi.YuruCra.Player
 
+import com.github.kotyabuchi.MCRPG.append
+import com.github.kotyabuchi.MCRPG.transactionWithLogger
 import com.github.kotyabuchi.YuruCra.Main
-import com.github.kotyabuchi.YuruCra.PlayerWrapper
-import com.github.kotyabuchi.YuruCra.PlayerWrapper.Companion.getWrapper
+import com.github.kotyabuchi.YuruCra.Player.PlayerWrapper.Companion.getWrapper
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.NamedTextColor
 import org.bukkit.event.EventHandler

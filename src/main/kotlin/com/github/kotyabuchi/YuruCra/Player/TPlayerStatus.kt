@@ -1,4 +1,4 @@
-package com.github.kotyabuchi.MCRPG
+package com.github.kotyabuchi.YuruCra.Player
 
 import org.jetbrains.exposed.sql.Table
 import org.jetbrains.exposed.sql.javatime.datetime
