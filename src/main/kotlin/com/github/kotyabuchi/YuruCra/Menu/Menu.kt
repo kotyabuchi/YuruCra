@@ -1,7 +1,6 @@
 package com.github.kotyabuchi.YuruCra.Menu
 
-import com.github.kotyabuchi.YuruCra.Menu.Button.MBBlank
-import com.github.kotyabuchi.YuruCra.Menu.Button.MenuButton
+import com.github.kotyabuchi.YuruCra.Menu.Button.*
 import com.github.kotyabuchi.YuruCra.toInt
 import net.kyori.adventure.text.Component
 import org.bukkit.Bukkit
@@ -20,14 +19,19 @@ abstract class Menu(
     private val hasTopFrame: Boolean = frames.contains(FrameType.TOP)
     private val hasSideFrame: Boolean = frames.contains(FrameType.SIDE)
     private val invRow: Int
-    private val invSize: Int
+    val invSize: Int
     var prevMenu: Menu? = null
         set(value) {
-            value?.let {
+            if (value == null) {
                 (0 until pages.size).forEach { page ->
                     setButton(page, invSize - 8, MBBlank())
                 }
+            } else {
+                (0 until pages.size).forEach { page ->
+                    setButton(page, invSize - 8, MBPrevMenu(value))
+                }
             }
+            field = value
         }
     private val buttons = mutableListOf(mutableMapOf<Int, MenuButton>())
 
@@ -67,14 +71,21 @@ abstract class Menu(
         return buttons[pageNum][slot]
     }
 
-    private fun createFooter(pageNum: Int = pages.size - 1) {
+    open fun createFooter(pageNum: Int = pages.size - 1) {
         val startSlot = invSize - 9
         (0 until 9).forEach {
             setButton(pageNum, startSlot + it, MBBlank())
         }
+
+        val totalPage = pages.size
+        if (pageNum > 0) {
+            setButton(pageNum, startSlot + 1, MBBackPage(pageNum, totalPage))
+        } else if (totalPage > pageNum + 1) {
+            setButton(pageNum, invSize - 2, MBNextPage(pageNum + 2, totalPage))
+        }
     }
 
-    private fun createFrame(pageNum: Int = pages.size - 1) {
+    open fun createFrame(pageNum: Int = pages.size - 1) {
         if (hasTopFrame) {
             (0 until 9).forEach {
                 setButton(pageNum, it, MBBlank())

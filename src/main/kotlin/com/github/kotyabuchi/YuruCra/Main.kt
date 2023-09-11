@@ -20,6 +20,7 @@ class Main: JavaPlugin() {
         val events: List<Listener> = listOf(
             // Menu
             MenuController,
+            Debug,
             PlayerManager,
         )
 

@@ -1,7 +1,6 @@
 package com.github.kotyabuchi.YuruCra.Player
 
 import com.github.kotyabuchi.YuruCra.Menu.Menu
-import net.kyori.adventure.text.Component
 import org.bukkit.entity.Player
 import java.time.LocalDateTime
 
@@ -23,8 +22,13 @@ class PlayerWrapper(player: Player): Player by player {
     val menuStatus: MenuStatus = MenuStatus()
 
     fun openMenu(menu: Menu, page: Int = 0) {
-        menuStatus.openingMenu = menu
-        menuStatus.openingPage = page
+        if (menuStatus.openingMenu?.prevMenu != menu) {
+            if (menuStatus.openingMenu != menu) {
+                menu.prevMenu = menuStatus.openingMenu
+            }
+            menuStatus.openingMenu = menu
+            menuStatus.openingPage = page
+        }
         openInventory(menu.getInventory(page))
     }
 }
