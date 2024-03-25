@@ -27,7 +27,11 @@ object MBCreateHome: MenuButton(), Listener {
         val player = info.player.getStatus()
         typingPlayers.add(info.player)
         player.closeMenu()
-        player.sendMessage(Component.text("作成するホームポイントの名前を入力してください。", NamedTextColor.GREEN))
+        player.sendMessage(
+            Component.text("作成するホームポイントの名前を入力してください。", NamedTextColor.GREEN)
+                .append(Component.text("\ncancel", NamedTextColor.RED))
+                .append(Component.text("と入力することでキャンセル出来ます。", NamedTextColor.WHITE))
+        )
     }
 
     @EventHandler
