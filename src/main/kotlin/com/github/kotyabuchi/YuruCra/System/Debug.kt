@@ -1,4 +1,4 @@
-package com.github.kotyabuchi.YuruCra
+package com.github.kotyabuchi.YuruCra.System
 
 import com.github.kotyabuchi.YuruCra.Menu.FrameType
 import com.github.kotyabuchi.YuruCra.Menu.TestMenu

@@ -7,6 +7,7 @@ import com.github.kotyabuchi.YuruCra.Menu.MenuController
 import com.github.kotyabuchi.YuruCra.Player.HomeCommand
 import com.github.kotyabuchi.YuruCra.Player.PlayerManager
 import com.github.kotyabuchi.YuruCra.Player.PlayerStatus.Companion.getStatus
+import com.github.kotyabuchi.YuruCra.System.Debug
 import org.bukkit.event.Listener
 import org.bukkit.plugin.java.JavaPlugin
 import java.io.File
@@ -24,10 +25,12 @@ class Main: JavaPlugin() {
         val events: List<Listener> = listOf(
             // Menu
             MenuController,
-            Debug,
-            PlayerManager,
                 // Home
             MBCreateHome,
+            // Player
+            PlayerManager,
+            // System
+            Debug,
         )
 
         events.forEach {
