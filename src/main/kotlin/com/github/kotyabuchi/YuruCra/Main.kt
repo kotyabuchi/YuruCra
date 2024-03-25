@@ -7,6 +7,7 @@ import com.github.kotyabuchi.YuruCra.Menu.MenuController
 import com.github.kotyabuchi.YuruCra.Player.HomeCommand
 import com.github.kotyabuchi.YuruCra.Player.PlayerManager
 import com.github.kotyabuchi.YuruCra.Player.PlayerStatus.Companion.getStatus
+import com.github.kotyabuchi.YuruCra.System.ChatSound
 import com.github.kotyabuchi.YuruCra.System.Debug
 import org.bukkit.event.Listener
 import org.bukkit.plugin.java.JavaPlugin
@@ -30,6 +31,7 @@ class Main: JavaPlugin() {
             // Player
             PlayerManager,
             // System
+            ChatSound,
             Debug,
         )
 
