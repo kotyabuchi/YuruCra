@@ -1,6 +1,6 @@
 package com.github.kotyabuchi.YuruCra.Menu
 
-import com.github.kotyabuchi.YuruCra.Player.PlayerWrapper.Companion.getWrapper
+import com.github.kotyabuchi.YuruCra.Player.PlayerStatus.Companion.getStatus
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
@@ -12,7 +12,7 @@ object MenuController: Listener {
 
     @EventHandler
     fun onButtonClick(event: InventoryClickEvent) {
-        val player = (event.whoClicked as? Player)?.getWrapper() ?: return
+        val player = (event.whoClicked as? Player)?.getStatus() ?: return
         val menuStatus = player.menuStatus
         val menu = menuStatus.openingMenu ?: return
         val menuInventory = menu.getInventory(menuStatus.openingPage)
@@ -41,9 +41,9 @@ object MenuController: Listener {
 
     @EventHandler
     fun onCloseMenu(event: InventoryCloseEvent) {
-        val player = (event.player as? Player)?.getWrapper() ?: return
+        val player = (event.player as? Player)?.getStatus() ?: return
         val menuStatus = player.menuStatus
         menuStatus.openingMenu?.doCloseMenuAction(event)
-        menuStatus.closeMenu()
+        if (event.reason != InventoryCloseEvent.Reason.OPEN_NEW) menuStatus.closeMenu()
     }
 }

@@ -19,7 +19,7 @@ repositories {
 
 dependencies {
     testImplementation(kotlin("test"))
-    compileOnly("io.papermc.paper:paper-api:1.20-R0.1-SNAPSHOT")
+    compileOnly("io.papermc.paper:paper-api:1.20.4-R0.1-SNAPSHOT")
     implementation("org.xerial:sqlite-jdbc:$sqliteJDBCVersion")
     implementation("org.jetbrains.exposed:exposed-core:$exposedVersion")
     implementation("org.jetbrains.exposed:exposed-dao:$exposedVersion")
@@ -33,7 +33,7 @@ tasks.test {
 }
 
 tasks.withType(ShadowJar::class.java) {
-    destinationDirectory.set(File("D:\\Minecraft\\Servers\\TestServer\\plugins"))
+    destinationDirectory.set(File("C:\\Development\\Minecraft\\Servers\\TestServer\\plugins"))
     dependencies {
         exclude(dependency("io.papermc.paper:paper-api"))
     }

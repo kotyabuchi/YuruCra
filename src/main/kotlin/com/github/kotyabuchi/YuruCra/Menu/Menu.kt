@@ -2,7 +2,7 @@ package com.github.kotyabuchi.YuruCra.Menu
 
 import com.github.kotyabuchi.YuruCra.Menu.Button.*
 import com.github.kotyabuchi.YuruCra.toInt
-import net.kyori.adventure.text.Component
+import net.kyori.adventure.text.TextComponent
 import org.bukkit.Bukkit
 import org.bukkit.event.inventory.InventoryClickEvent
 import org.bukkit.event.inventory.InventoryCloseEvent
@@ -11,8 +11,8 @@ import kotlin.math.max
 import kotlin.math.min
 
 abstract class Menu(
-    val title: Component,
-    private var menuRow: Int = 1,
+    val title: TextComponent,
+    var menuRow: Int = 1,
     frames: Set<FrameType> = setOf(),
 ) {
     private val pages: MutableList<Inventory> = mutableListOf()
@@ -46,18 +46,32 @@ abstract class Menu(
 
     open fun createMenu() {}
 
-    fun createNewPage() {
-        val newPage = Bukkit.createInventory(null, (hasTopFrame.toInt() + menuRow + 1) * 9, title)
+    private fun createNewPage() {
+        val newPage = Bukkit.createInventory(null, invSize, title)
         pages.add(newPage)
         buttons.add(mutableMapOf())
         createFrame()
         createFooter()
     }
 
-    fun createNewPageIfNeed(pageNum: Int) {
+    private fun createNewPageIfNeed(pageNum: Int) {
         repeat(max(0, pageNum - pages.size + 1)) {
             createNewPage()
+            if (pages.size > 1) createFooter(pages.size - 2)
         }
+    }
+
+    fun addButton(pageNum: Int, button: MenuButton): Boolean {
+        createNewPageIfNeed(pageNum)
+        var result = false
+        for (slot in 9 until (menuRow + 1) * 9) {
+            if (!buttons[pageNum].containsKey(slot)) {
+                setButton(pageNum, slot, button)
+                result = true
+                break
+            }
+        }
+        return result
     }
 
     fun setButton(pageNum: Int, slot: Int, button: MenuButton) {
