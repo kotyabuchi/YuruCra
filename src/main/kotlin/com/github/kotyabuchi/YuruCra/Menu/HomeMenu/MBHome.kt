@@ -27,4 +27,8 @@ class MBHome(private val homeInfo: HomeInfo): MenuButton() {
         val player = info.player
         player.teleport(homeInfo.location)
     }
+
+    override fun doRightClickAction(info: ButtonClickInfo) {
+
+    }
 }
