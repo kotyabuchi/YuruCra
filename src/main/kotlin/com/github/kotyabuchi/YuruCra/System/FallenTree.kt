@@ -1,35 +1,76 @@
 package com.github.kotyabuchi.YuruCra.System
 
-import net.kyori.adventure.text.Component
+import com.github.kotyabuchi.YuruCra.Main
+import com.github.kotyabuchi.YuruCra.Utility.*
 import org.bukkit.Material
-import org.bukkit.TreeType
+import org.bukkit.NamespacedKey
+import org.bukkit.block.Block
+import org.bukkit.block.data.Waterlogged
+import org.bukkit.entity.Entity
+import org.bukkit.entity.FallingBlock
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.block.BlockBreakEvent
-import org.bukkit.event.block.BlockPlaceEvent
-import java.util.Random
+import org.bukkit.event.entity.EntityChangeBlockEvent
+import org.bukkit.event.entity.EntityDropItemEvent
+import org.bukkit.inventory.ItemStack
+import org.bukkit.persistence.PersistentDataType
 
 object FallenTree: Listener {
+
+    private val main: Main = Main.instance
+    private val fallenTreeKey = NamespacedKey(main, "fallenTree")
 
     @EventHandler
     fun onBreak(event: BlockBreakEvent) {
         val player = event.player
+        val toolItemStack = player.inventory.itemInMainHand
         val block = event.block
+        val material = block.type
 
+        if (material.isLog()) {
+            val world = block.world
+            val treeBlocks = mutableListOf<Block>()
+            val treeType = TreeType.fromMaterial(material) ?: return
+
+            BlockUtil.searchTreeStructure(block, block, treeType, treeBlocks)
+
+            treeBlocks.forEach {
+                world.spawn(it.location.toCenterLocation().subtract(.0, .5, .0), FallingBlock::class.java) { fallingSand ->
+                    val dropItems = it.getDrops(toolItemStack).map { it.serializeAsBytes() }
+                    fallingSand.blockData = it.blockData
+                    fallingSand.blockState = it.state.copy()
+                    fallingSand.persistentDataContainer.set(fallenTreeKey, PersistentDataType.LIST.byteArrays(), dropItems)
+                    if ((it.blockData as? Waterlogged)?.isWaterlogged == true) {
+                        it.type = Material.WATER
+                    } else {
+                        it.type = Material.AIR
+                    }
+                }
+            }
+        }
     }
 
     @EventHandler
-    fun onPlace(event: BlockPlaceEvent) {
-        val player = event.player
-        val block = event.block
-        val material = event.itemInHand.type
-        player.sendMessage(Component.text(material.name))
-        if (!material.name.contains("_SAPLING") || material.name.contains("POTTED_")) return
-        event.isCancelled = true
-        block.type = Material.GLASS
-        val treeTypeName = material.name.removePrefix("POTTED_").removeSuffix("_SAPLING")
-        player.sendMessage(treeTypeName)
-        val treeType = if (TreeType.values().map { it.name }.contains(treeTypeName)) TreeType.valueOf(treeTypeName) else TreeType.TREE
-        player.sendMessage(block.world.generateTree(block.location, Random(), treeType).toString())
+    fun onLanding(event: EntityChangeBlockEvent) {
+        if (dropItem(event.entity)) event.isCancelled = true
+    }
+
+    @EventHandler
+    fun onDropItem(event: EntityDropItemEvent) {
+        if (dropItem(event.entity)) event.isCancelled = true
+    }
+
+    private fun dropItem(entity: Entity): Boolean {
+        if (entity !is FallingBlock) return false
+        val dropItemByteArray = entity.persistentDataContainer.get(fallenTreeKey, PersistentDataType.LIST.byteArrays()) ?: return false
+
+        dropItemByteArray.forEach {
+            val dropItem = ItemStack.deserializeBytes(it)
+            entity.world.dropItemNaturally(entity.location, dropItem)
+        }
+
+        entity.remove()
+        return true
     }
 }

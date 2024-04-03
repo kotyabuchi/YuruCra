@@ -3,12 +3,12 @@ package com.github.kotyabuchi.YuruCra.Utility
 import org.bukkit.Material
 
 enum class TreeType {
+    DARK_OAK,
     OAK,
     SPRUCE,
     BIRCH,
     JUNGLE,
     ACACIA,
-    DARK_OAK,
     MANGROVE,
     CHERRY,
     CRIMSON,
@@ -17,9 +17,10 @@ enum class TreeType {
 
     companion object {
         fun fromMaterial(material: Material): TreeType? {
-            return when (material.name) {
-                else -> null
+            values().forEach {
+                if (material.name.contains(it.name)) return it
             }
+            return null
         }
     }
 }
