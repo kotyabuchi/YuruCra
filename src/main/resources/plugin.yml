@@ -5,3 +5,4 @@ author: kotyabuchi
 api-version: '1.20'
 commands:
   home:
+  itemedit:

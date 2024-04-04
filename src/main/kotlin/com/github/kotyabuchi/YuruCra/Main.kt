@@ -2,6 +2,9 @@ package com.github.kotyabuchi.YuruCra
 
 import com.github.kotyabuchi.MCRPG.DBConnector
 import com.github.kotyabuchi.MCRPG.transactionWithLogger
+import com.github.kotyabuchi.YuruCra.Event.CustomEventCaller
+import com.github.kotyabuchi.YuruCra.Item.ItemExtensionCommand
+import com.github.kotyabuchi.YuruCra.Item.ItemExtensionManager
 import com.github.kotyabuchi.YuruCra.Menu.HomeMenu.MBCreateHome
 import com.github.kotyabuchi.YuruCra.Menu.MenuController
 import com.github.kotyabuchi.YuruCra.Player.HomeCommand
@@ -25,6 +28,10 @@ class Main: JavaPlugin() {
     private fun registerEvents() {
         val pm = server.pluginManager
         val events: List<Listener> = listOf(
+            // Event
+            CustomEventCaller,
+            // Item
+            ItemExtensionManager,
             // Menu
             MenuController,
                 // Home
@@ -45,6 +52,7 @@ class Main: JavaPlugin() {
 
     private fun registerCommands() {
         getCommand("home")?.setExecutor(HomeCommand)
+        getCommand("itemedit")?.setExecutor(ItemExtensionCommand)
     }
 
     override fun onEnable() {
