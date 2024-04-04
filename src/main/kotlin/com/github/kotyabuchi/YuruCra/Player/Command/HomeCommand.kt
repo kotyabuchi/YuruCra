@@ -1,4 +1,4 @@
-package com.github.kotyabuchi.YuruCra.Player
+package com.github.kotyabuchi.YuruCra.Player.Command
 
 import com.github.kotyabuchi.YuruCra.Menu.HomeMenu.HomeMenu
 import com.github.kotyabuchi.YuruCra.Player.PlayerStatus.Companion.getStatus

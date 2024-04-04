@@ -18,6 +18,7 @@ class PlayerStatus(player: Player): Player by player {
     var lastLogin: LocalDateTime = LocalDateTime.now()
     val loginTime: LocalDateTime = LocalDateTime.now()
     var lastPlayVersion: Double = 0.0
+    var isDebugMode: Boolean = false
 
     val menuStatus: MenuStatus = MenuStatus()
 

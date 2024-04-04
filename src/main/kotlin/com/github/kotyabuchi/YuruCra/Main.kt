@@ -7,7 +7,8 @@ import com.github.kotyabuchi.YuruCra.Item.ItemExtensionCommand
 import com.github.kotyabuchi.YuruCra.Item.ItemExtensionManager
 import com.github.kotyabuchi.YuruCra.Menu.HomeMenu.MBCreateHome
 import com.github.kotyabuchi.YuruCra.Menu.MenuController
-import com.github.kotyabuchi.YuruCra.Player.HomeCommand
+import com.github.kotyabuchi.YuruCra.Player.Command.HomeCommand
+import com.github.kotyabuchi.YuruCra.Player.Command.PlayerManageCommand
 import com.github.kotyabuchi.YuruCra.Player.PlayerManager
 import com.github.kotyabuchi.YuruCra.Player.PlayerStatus.Companion.getStatus
 import com.github.kotyabuchi.YuruCra.System.ChatSound
@@ -53,6 +54,7 @@ class Main: JavaPlugin() {
     private fun registerCommands() {
         getCommand("home")?.setExecutor(HomeCommand)
         getCommand("itemedit")?.setExecutor(ItemExtensionCommand)
+        getCommand("debugmode")?.setExecutor(PlayerManageCommand)
     }
 
     override fun onEnable() {
