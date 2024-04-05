@@ -4,7 +4,6 @@ import com.github.kotyabuchi.MCRPG.normalize
 import com.github.kotyabuchi.YuruCra.Main
 import com.github.kotyabuchi.YuruCra.Mastering.Mastering
 import com.github.kotyabuchi.YuruCra.Mastering.Skill.Skill
-import com.github.kotyabuchi.YuruCra.Player.PlayerStatus.Companion.getStatus
 import com.github.kotyabuchi.YuruCra.Utility.floor2Digits
 import com.github.kotyabuchi.YuruCra.Utility.floor3Digits
 import com.github.kotyabuchi.YuruCra.Utility.upperCamelCase
@@ -51,19 +50,19 @@ class MasteringManager(private val player: Player) {
 
         mastering.getPassiveSkills().forEach {
             if (level == it.needLevel) {
-                it.enableSkill(player.getStatus(), level)
+                it.enableSkill(player, level)
                 notifyLearnedSkill(it)
             }
         }
         mastering.getSkills().values.forEach {
             if (level == it.needLevel) {
-                it.enableSkill(player.getStatus(), level)
+                it.enableSkill(player, level)
                 notifyLearnedSkill(it)
             }
         }
     }
 
-    fun addJobExp(mastering: Mastering, point: Double, increaseCombo: Int = 1) {
+    fun addExp(mastering: Mastering, point: Double, increaseCombo: Int = 1) {
         val masteringStatus = getMasteringStatus(mastering)
         if (masteringStatus.addExp(point, increaseCombo) == MasteringStatus.AddExpResult.LEVEL_UP) levelUp(mastering, masteringStatus.getLevel())
         val addedExp = masteringStatus.getRecentAddedExp()
@@ -85,7 +84,7 @@ class MasteringManager(private val player: Player) {
             append(Component.text(" ${combo}Combo(x${(1 + combo * 0.002).floor3Digits()})", NamedTextColor.GOLD).normalize())
         }
         val progress = (exp / nextLevelExp).toFloat()
-        val bossBar = expBars[mastering]?.apply {
+        val expBar = expBars[mastering]?.apply {
             name(title)
             progress(progress)
         } ?: run {
@@ -93,13 +92,22 @@ class MasteringManager(private val player: Player) {
             expBars[mastering] = expBar
             expBar
         }
+        player.showBossBar(expBar)
         expBarRunnableMap[mastering] = object : BukkitRunnable() {
             override fun run() {
                 masteringStatus.resetCombo()
-                bossBar.removeViewer(player)
+                player.hideBossBar(expBar)
+                expBars.remove(mastering)
+                expBarRunnableMap.remove(mastering)
             }
         }.runTaskLater(main, 20 * 6L)
         setMasteringStatus(mastering, masteringStatus)
+    }
+
+    fun clearExpBar() {
+        player.activeBossBars().forEach {
+            player.hideBossBar(it)
+        }
     }
 
     fun setMasteringStatus(mastering: Mastering, masteringStatus: MasteringStatus) {

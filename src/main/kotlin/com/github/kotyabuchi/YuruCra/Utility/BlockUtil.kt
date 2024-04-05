@@ -2,7 +2,7 @@ package com.github.kotyabuchi.YuruCra.Utility
 
 import com.github.kotyabuchi.YuruCra.Event.BlockMineEvent
 import com.github.kotyabuchi.YuruCra.Main
-import com.github.kotyabuchi.YuruCra.Player.PlayerStatus
+import com.github.kotyabuchi.YuruCra.Player.PlayerStatus.Companion.getStatus
 import org.bukkit.GameMode
 import org.bukkit.Material
 import org.bukkit.Particle
@@ -13,6 +13,7 @@ import org.bukkit.block.Chest
 import org.bukkit.block.Container
 import org.bukkit.block.data.type.Leaves
 import org.bukkit.entity.Item
+import org.bukkit.entity.Player
 import org.bukkit.event.block.BlockDropItemEvent
 import org.bukkit.inventory.ItemStack
 
@@ -110,7 +111,7 @@ fun Block.getAroundBlocks(): List<Block> {
     return result
 }
 
-fun Block.miningWithEvent(main: Main, player: PlayerStatus, itemStack: ItemStack, mainBlock: Block = this, damage: Boolean = true, isMultiBreak: Boolean = false, isMineAssist: Boolean = false, dropItemCallBack: (BlockDropItemEvent) -> Unit = {}, blockCallBack: (Block) -> Unit = {}) {
+fun Block.miningWithEvent(main: Main, player: Player, itemStack: ItemStack, mainBlock: Block = this, damage: Boolean = true, isMultiBreak: Boolean = false, isMineAssist: Boolean = false, dropItemCallBack: (BlockDropItemEvent) -> Unit = {}, blockCallBack: (Block) -> Unit = {}) {
     val isMainBlock = this == mainBlock
     val mineEvent = BlockMineEvent(this, player, itemStack, isMainBlock, isMultiBreak, isMineAssist)
     main.server.pluginManager.callEvent(mineEvent)
@@ -119,10 +120,10 @@ fun Block.miningWithEvent(main: Main, player: PlayerStatus, itemStack: ItemStack
     }
 }
 
-fun Block.breakBlock(main: Main, player: PlayerStatus, itemStack: ItemStack, mainBlock: Block, damage: Boolean, dropItemCallBack: (BlockDropItemEvent) -> Unit = {}, blockCallBack: (Block) -> Unit = {}) {
+fun Block.breakBlock(main: Main, player: Player, itemStack: ItemStack, mainBlock: Block, damage: Boolean, dropItemCallBack: (BlockDropItemEvent) -> Unit = {}, blockCallBack: (Block) -> Unit = {}) {
     val dropItems = mutableListOf<Item>()
-    if (player.isDebugMode || player.gameMode != GameMode.CREATIVE) {
-        this.getDrops(itemStack, player.player).forEach { item ->
+    if (player.getStatus().isDebugMode || player.gameMode != GameMode.CREATIVE) {
+        this.getDrops(itemStack, player).forEach { item ->
             if (!item.type.isAir) {
                 val dropItem = mainBlock.world.dropItem(mainBlock.location.toCenterLocation(), item)
                 dropItems.add(dropItem)

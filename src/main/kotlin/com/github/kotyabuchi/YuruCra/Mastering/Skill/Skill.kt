@@ -1,12 +1,12 @@
 package com.github.kotyabuchi.YuruCra.Mastering.Skill
 
 import com.github.kotyabuchi.YuruCra.Main
-import com.github.kotyabuchi.YuruCra.Player.PlayerStatus
 import com.github.kotyabuchi.YuruCra.Utility.floor1Digits
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.NamedTextColor
 import org.bukkit.NamespacedKey
 import org.bukkit.Sound
+import org.bukkit.entity.Player
 import org.bukkit.event.Listener
 import java.util.*
 
@@ -23,7 +23,7 @@ interface Skill: Listener {
     val lastUseTime: MutableMap<UUID, Long>
     fun getSkillKey(): NamespacedKey = NamespacedKey(main, skillName)
 
-    fun enableSkill(player: PlayerStatus, level: Int) {
+    fun enableSkill(player: Player, level: Int) {
         val uuid = player.uniqueId
         when {
             level < needLevel -> {
@@ -52,7 +52,7 @@ interface Skill: Listener {
         }
     }
 
-    fun enableAction(player: PlayerStatus, level: Int) {
+    fun enableAction(player: Player, level: Int) {
         player.playSound(player.eyeLocation, Sound.ENTITY_PLAYER_LEVELUP, 0.2f, 2.0f)
         player.sendActionBar(Component.text(displayName, NamedTextColor.GREEN))
     }
@@ -69,7 +69,7 @@ interface Skill: Listener {
         return getRemainingCoolTime(uuid) <= 0L
     }
 
-    fun sendErrorMessage(player: PlayerStatus, message: Component) {
+    fun sendErrorMessage(player: Player, message: Component) {
         player.playSound(player.location, Sound.ENTITY_BLAZE_SHOOT, 0.5f, 2f)
         player.sendActionBar(message)
     }

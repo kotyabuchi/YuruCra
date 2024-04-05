@@ -1,12 +1,12 @@
 package com.github.kotyabuchi.YuruCra.Event
 
-import com.github.kotyabuchi.YuruCra.Player.PlayerStatus
 import org.bukkit.Statistic
 import org.bukkit.block.Block
+import org.bukkit.entity.Player
 import org.bukkit.event.block.BlockBreakEvent
 import org.bukkit.inventory.ItemStack
 
-class BlockMineEvent(block: Block, player: PlayerStatus, val itemStack: ItemStack, val isMainBlock: Boolean, val isMultiBreak: Boolean = false, val isMineAssist: Boolean = false): BlockBreakEvent(block, player) {
+class BlockMineEvent(block: Block, player: Player, val itemStack: ItemStack, val isMainBlock: Boolean, val isMultiBreak: Boolean = false, val isMineAssist: Boolean = false): BlockBreakEvent(block, player) {
 
     private var cancelled = false
 

@@ -5,7 +5,6 @@ import com.github.kotyabuchi.YuruCra.Mastering.Skill.PassiveSkill
 import com.github.kotyabuchi.YuruCra.Mastering.Skill.Skill
 import com.github.kotyabuchi.YuruCra.Mastering.Skill.SkillCommand
 import com.github.kotyabuchi.YuruCra.Mastering.Skill.ToggleSkill
-import com.github.kotyabuchi.YuruCra.Player.PlayerStatus
 import com.github.kotyabuchi.YuruCra.Player.PlayerStatus.Companion.getStatus
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.NamedTextColor
@@ -36,7 +35,7 @@ abstract class Mastering(val masteringName: String): Listener {
 
     @EventHandler
     fun modeChange(event: PlayerSwapHandItemsEvent) {
-        val player = event.player.getStatus()
+        val player = event.player
         if (player.isSneaking) return
         if (!targetTool.contains(event.offHandItem.type)) return
         event.isCancelled = true
@@ -56,7 +55,7 @@ abstract class Mastering(val masteringName: String): Listener {
     @EventHandler(priority = EventPriority.HIGHEST)
     fun onClick(event: PlayerInteractEvent) {
 //        if (event is PlayerInteractBlockEvent) return
-        val player = event.player.getStatus()
+        val player = event.player
         if (!castingPlayerList.contains(player)) return
         event.isCancelled = true
         if (event.hand != EquipmentSlot.HAND) return
@@ -137,7 +136,7 @@ abstract class Mastering(val masteringName: String): Listener {
         return passiveSkillSet
     }
 
-    private fun activeSkill(player: PlayerStatus) {
+    private fun activeSkill(player: Player) {
         val castingAction = castingCommandMap[player] ?: return
         try {
             val skillCommand = SkillCommand.valueOf(castingAction)
@@ -145,7 +144,7 @@ abstract class Mastering(val masteringName: String): Listener {
             if (skill == null) {
                 notRegisterActionNotice(player)
             } else {
-                val level = player.masteringManager.getLevel(this)
+                val level = player.getStatus().masteringManager.getLevel(this)
                 if (skill is ToggleSkill) {
                     skill.toggleSkill(player, level)
                 } else {

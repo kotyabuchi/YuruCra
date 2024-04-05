@@ -1,10 +1,10 @@
 package com.github.kotyabuchi.YuruCra.Mastering.Skill
 
-import com.github.kotyabuchi.YuruCra.Player.PlayerStatus
 import com.github.kotyabuchi.YuruCra.Utility.floor1Digits
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.NamedTextColor
 import org.bukkit.Sound
+import org.bukkit.entity.Player
 import org.bukkit.scheduler.BukkitRunnable
 import org.bukkit.scheduler.BukkitTask
 import java.util.*
@@ -15,7 +15,7 @@ interface ActiveSkill: ToggleSkill {
 
     fun calcActiveTime(level: Int): Int = 0
 
-    override fun enableSkill(player: PlayerStatus, level: Int) {
+    override fun enableSkill(player: Player, level: Int) {
         val uuid = player.uniqueId
         when {
             level < needLevel -> {
@@ -42,7 +42,7 @@ interface ActiveSkill: ToggleSkill {
         }
     }
 
-    override fun disableSkill(player: PlayerStatus) {
+    override fun disableSkill(player: Player) {
         val uuid = player.uniqueId
         disableAction(player)
         activeTimeMap[uuid]?.cancel()
@@ -50,7 +50,7 @@ interface ActiveSkill: ToggleSkill {
         removeSkillLevel(player)
     }
 
-    fun restartActiveTime(player: PlayerStatus, level: Int) {
+    fun restartActiveTime(player: Player, level: Int) {
         val uuid = player.uniqueId
         activeTimeMap[uuid]?.cancel()
         activeTimeMap[uuid] = object : BukkitRunnable() {

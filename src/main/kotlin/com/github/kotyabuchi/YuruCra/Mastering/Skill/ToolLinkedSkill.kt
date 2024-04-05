@@ -1,6 +1,5 @@
 package com.github.kotyabuchi.YuruCra.Mastering.Skill
 
-import com.github.kotyabuchi.YuruCra.Player.PlayerStatus.Companion.getStatus
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.entity.PlayerDeathEvent
@@ -18,7 +17,7 @@ interface ToolLinkedSkill: ActiveSkill {
 
     @EventHandler
     fun onClickItem(event: InventoryClickEvent) {
-        val player = (event.whoClicked as? Player)?.getStatus() ?: return
+        val player = event.whoClicked as? Player ?: return
         if (!isEnabledSkill(player)) return
         if (event.clickedInventory == null) return
         if (event.slot != player.inventory.heldItemSlot) return
@@ -28,7 +27,7 @@ interface ToolLinkedSkill: ActiveSkill {
 
     @EventHandler
     fun onBreakItem(event: PlayerItemBreakEvent) {
-        val player = event.player.getStatus()
+        val player = event.player
         if (isEnabledSkill(player)) {
             skillItemBackup.remove(player.uniqueId)
             disableSkill(player)
@@ -37,7 +36,7 @@ interface ToolLinkedSkill: ActiveSkill {
 
     @EventHandler
     fun onChangeItemSlot(event: PlayerItemHeldEvent) {
-        val player = event.player.getStatus()
+        val player = event.player
         if (isEnabledSkill(player)) {
             disableSkill(player)
         }
@@ -45,7 +44,7 @@ interface ToolLinkedSkill: ActiveSkill {
 
     @EventHandler
     fun onDropItem(event: PlayerDropItemEvent) {
-        val player = event.player.getStatus()
+        val player = event.player
         if (isEnabledSkill(player)) {
             player.inventory.setItemInMainHand(event.itemDrop.itemStack)
             event.itemDrop.remove()
@@ -55,7 +54,7 @@ interface ToolLinkedSkill: ActiveSkill {
 
     @EventHandler
     fun onDeath(event: PlayerDeathEvent) {
-        val player = event.entity.getStatus()
+        val player = event.entity
         if (isEnabledSkill(player)) {
             disableSkill(player)
         }
@@ -63,7 +62,7 @@ interface ToolLinkedSkill: ActiveSkill {
 
     @EventHandler
     fun onLogout(event: PlayerQuitEvent) {
-        val player = event.player.getStatus()
+        val player = event.player
         if (isEnabledSkill(player)) {
             disableSkill(player)
         }

@@ -1,7 +1,6 @@
 package com.github.kotyabuchi.YuruCra.Event
 
 import com.github.kotyabuchi.YuruCra.Main
-import com.github.kotyabuchi.YuruCra.Player.PlayerStatus.Companion.getStatus
 import com.github.kotyabuchi.YuruCra.Utility.miningWithEvent
 import org.bukkit.event.Event
 import org.bukkit.event.EventHandler
@@ -18,7 +17,7 @@ object CustomEventCaller: Listener {
     fun onBlockBreak(event: BlockBreakEvent) {
         if (event is BlockMineEvent) return
         if (event.isCancelled) return
-        val player = event.player.getStatus()
+        val player = event.player
         val block = event.block
         val itemStack = player.inventory.itemInMainHand
 

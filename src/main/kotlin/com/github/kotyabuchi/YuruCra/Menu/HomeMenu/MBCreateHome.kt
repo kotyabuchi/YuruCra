@@ -4,7 +4,6 @@ import com.github.kotyabuchi.MCRPG.transactionWithLogger
 import com.github.kotyabuchi.YuruCra.Menu.Button.MenuButton
 import com.github.kotyabuchi.YuruCra.Menu.ButtonClickInfo
 import com.github.kotyabuchi.YuruCra.Player.HomeInfo
-import com.github.kotyabuchi.YuruCra.Player.PlayerStatus
 import com.github.kotyabuchi.YuruCra.Player.PlayerStatus.Companion.getStatus
 import com.github.kotyabuchi.YuruCra.Player.TPlayerHomes
 import io.papermc.paper.event.player.AsyncChatEvent
@@ -13,6 +12,7 @@ import net.kyori.adventure.text.TextComponent
 import net.kyori.adventure.text.format.NamedTextColor
 import net.kyori.adventure.text.format.TextDecoration
 import org.bukkit.Material
+import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.jetbrains.exposed.sql.insert
@@ -21,12 +21,12 @@ object MBCreateHome: MenuButton(), Listener {
     override val material: Material = Material.ENDER_EYE
     override val displayName: TextComponent = Component.text("create home", NamedTextColor.GREEN)
 
-    private val typingPlayers: MutableSet<PlayerStatus> = mutableSetOf()
+    private val typingPlayers: MutableSet<Player> = mutableSetOf()
 
     override fun doLeftClickAction(info: ButtonClickInfo) {
-        val player = info.player.getStatus()
+        val player = info.player
         typingPlayers.add(info.player)
-        player.closeMenu()
+        player.getStatus().closeMenu()
         player.sendMessage(
             Component.text("作成するホームポイントの名前を入力してください。", NamedTextColor.GREEN)
                 .append(Component.text("\ncancel", NamedTextColor.RED))
@@ -36,7 +36,7 @@ object MBCreateHome: MenuButton(), Listener {
 
     @EventHandler
     fun onEnterChat(event: AsyncChatEvent) {
-        val player = event.player.getStatus()
+        val player = event.player
         if (!typingPlayers.contains(player)) return
         event.isCancelled = true
         val location = player.location
@@ -67,7 +67,7 @@ object MBCreateHome: MenuButton(), Listener {
             results?.let {
                 it.forEach { result ->
                     player.sendMessage(Component.text("ホームポイント[$homeName]を追加しました。", NamedTextColor.GREEN))
-                    player.homes.add(
+                    player.getStatus().homes.add(
                         HomeInfo(
                             id = result[TPlayerHomes.id].value,
                             name = homeName,

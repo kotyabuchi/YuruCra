@@ -12,8 +12,8 @@ object MenuController: Listener {
 
     @EventHandler
     fun onButtonClick(event: InventoryClickEvent) {
-        val player = (event.whoClicked as? Player)?.getStatus() ?: return
-        val menuStatus = player.menuStatus
+        val player = event.whoClicked as? Player ?: return
+        val menuStatus = player.getStatus().menuStatus
         val menu = menuStatus.openingMenu ?: return
         val menuInventory = menu.getInventory(menuStatus.openingPage)
 

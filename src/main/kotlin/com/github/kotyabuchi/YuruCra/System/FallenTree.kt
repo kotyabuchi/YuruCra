@@ -1,7 +1,9 @@
 package com.github.kotyabuchi.YuruCra.System
 
 import com.github.kotyabuchi.YuruCra.Main
-import com.github.kotyabuchi.YuruCra.Utility.*
+import com.github.kotyabuchi.YuruCra.Utility.BlockUtil
+import com.github.kotyabuchi.YuruCra.Utility.TreeType
+import com.github.kotyabuchi.YuruCra.Utility.isLog
 import org.bukkit.Material
 import org.bukkit.NamespacedKey
 import org.bukkit.block.Block
@@ -34,6 +36,7 @@ object FallenTree: Listener {
             val treeType = TreeType.fromMaterial(material) ?: return
 
             BlockUtil.searchTreeStructure(block, block, treeType, treeBlocks)
+            treeBlocks.remove(block)
 
             treeBlocks.forEach {
                 world.spawn(it.location.toCenterLocation().subtract(.0, .5, .0), FallingBlock::class.java) { fallingSand ->

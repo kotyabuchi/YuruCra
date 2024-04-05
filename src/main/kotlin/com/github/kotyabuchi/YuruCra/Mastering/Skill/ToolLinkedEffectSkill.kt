@@ -1,14 +1,14 @@
 package com.github.kotyabuchi.YuruCra.Mastering.Skill
 
-import com.github.kotyabuchi.YuruCra.Player.PlayerStatus
 import com.github.kotyabuchi.YuruCra.Player.PlayerStatus.Companion.getStatus
 import org.bukkit.Material
+import org.bukkit.entity.Player
 import org.bukkit.scheduler.BukkitRunnable
 
 abstract class ToolLinkedEffectSkill: PassiveSkill {
     abstract val targetToolType: Set<Material>
 
-    abstract fun applyEffect(player: PlayerStatus)
+    abstract fun applyEffect(player: Player)
 
     fun startCycle() {
         object : BukkitRunnable() {

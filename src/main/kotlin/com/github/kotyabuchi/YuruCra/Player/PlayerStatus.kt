@@ -4,7 +4,7 @@ import com.github.kotyabuchi.YuruCra.Menu.Menu
 import org.bukkit.entity.Player
 import java.time.LocalDateTime
 
-class PlayerStatus(player: Player): Player by player {
+class PlayerStatus(private val player: Player): Player by player {
 
     companion object {
         private val players = mutableMapOf<Player, PlayerStatus>()
@@ -44,5 +44,5 @@ class PlayerStatus(player: Player): Player by player {
     val homes: MutableList<HomeInfo> = mutableListOf()
 
     // MasteringSystem
-    val masteringManager: MasteringManager = MasteringManager(this)
+    val masteringManager: MasteringManager = MasteringManager(player)
 }

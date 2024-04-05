@@ -44,7 +44,7 @@ object PlayerManageCommand: CommandBaseFrame() {
                             return true
                         }
                     } else {
-                        main.server.getPlayer(args[1])?.getStatus() ?: run {
+                        main.server.getPlayer(args[0])?.getStatus() ?: run {
                             sender.sendMessage(Component.text("対象のプレイヤーが見つかりません", NamedTextColor.RED))
                             return true
                         }
