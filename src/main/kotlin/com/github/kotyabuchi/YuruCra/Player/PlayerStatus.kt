@@ -20,6 +20,7 @@ class PlayerStatus(player: Player): Player by player {
     var lastPlayVersion: Double = 0.0
     var isDebugMode: Boolean = false
 
+    // MenuSystem
     val menuStatus: MenuStatus = MenuStatus()
 
     fun openMenu(menu: Menu, page: Int = 0) {
@@ -39,5 +40,9 @@ class PlayerStatus(player: Player): Player by player {
         closeInventory()
     }
 
+    // HomeSystem
     val homes: MutableList<HomeInfo> = mutableListOf()
+
+    // MasteringSystem
+    val masteringManager: MasteringManager = MasteringManager(this)
 }
