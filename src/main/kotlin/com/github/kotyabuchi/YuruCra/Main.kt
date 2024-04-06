@@ -45,6 +45,7 @@ class Main: JavaPlugin() {
             KeepCropAndReplant,
             KeepFarmland,
             LevelTheFarmlandAndPath,
+            StarterItem,
         )
 
         MasteringType.values().forEach {
