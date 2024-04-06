@@ -3,6 +3,8 @@ package com.github.kotyabuchi.YuruCra.Player
 import com.github.kotyabuchi.MCRPG.append
 import com.github.kotyabuchi.MCRPG.transactionWithLogger
 import com.github.kotyabuchi.YuruCra.Main
+import com.github.kotyabuchi.YuruCra.Mastering.MasteringType
+import com.github.kotyabuchi.YuruCra.Mastering.TMasteringStatus
 import com.github.kotyabuchi.YuruCra.Player.PlayerStatus.Companion.getStatus
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.NamedTextColor
@@ -13,6 +15,7 @@ import org.bukkit.event.Listener
 import org.bukkit.event.player.PlayerJoinEvent
 import org.bukkit.event.player.PlayerQuitEvent
 import org.jetbrains.exposed.sql.*
+import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import java.time.LocalDateTime
 import java.time.ZoneOffset
 import java.time.format.DateTimeFormatter
@@ -26,6 +29,7 @@ object PlayerManager: Listener {
         transactionWithLogger {
             SchemaUtils.create(TPlayerStatus)
             SchemaUtils.create(TPlayerHomes)
+            SchemaUtils.create(TMasteringStatus)
 
             main.server.onlinePlayers.forEach {
                 loadPlayerData(it.getStatus())
@@ -99,6 +103,11 @@ object PlayerManager: Listener {
                 )
             }
         }
+        TMasteringStatus.selectAll().andWhere { TMasteringStatus.uuid eq uuidStr }.forEach {
+            MasteringType.getMastering(it[TMasteringStatus.masteringId])?.let { masteringType ->
+                player.masteringManager.getMasteringStatus(masteringType.masteringClass).setTotalExp(it[TMasteringStatus.totalExp])
+            }
+        }
     }
 
     fun savePlayerData(player: PlayerStatus) {
@@ -117,6 +126,22 @@ object PlayerManager: Listener {
                 it[playTime] = player.playTime + currentPlayTime
                 it[lastLoginDate] = player.loginTime
                 it[lastPlayVersion] = main.server.version.toDoubleOrNull() ?: 0.0
+            }
+        }
+        MasteringType.values().forEach { masteringType ->
+            val masteringStatus = player.masteringManager.getMasteringStatus(masteringType.masteringClass)
+            val masteringCondition = (TMasteringStatus.uuid eq uuidStr) and (TMasteringStatus.masteringId eq masteringType.id)
+            val masteringDataExists = TMasteringStatus.select { masteringCondition }.singleOrNull() != null
+            if (masteringDataExists) {
+                TMasteringStatus.update({ masteringCondition }) {
+                    it[totalExp] = masteringStatus.getTotalExp()
+                }
+            } else {
+                TMasteringStatus.insert {
+                    it[masteringId] = masteringType.id
+                    it[uuid] = uuidStr
+                    it[totalExp] = masteringStatus.getTotalExp()
+                }
             }
         }
     }

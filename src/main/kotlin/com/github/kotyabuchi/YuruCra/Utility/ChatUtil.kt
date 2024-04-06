@@ -1,5 +1,9 @@
 package com.github.kotyabuchi.YuruCra.Utility
 
+import com.github.kotyabuchi.MCRPG.normalize
+import net.kyori.adventure.text.Component
+import net.kyori.adventure.text.format.NamedTextColor
+import org.bukkit.entity.Player
 import kotlin.math.floor
 
 fun String.upperCamelCase(): String {
@@ -46,4 +50,20 @@ fun String.toDecimal() : Int {
                 0
             }
         }
+}
+
+fun Player.sendSuccessMessage(message: String) {
+    this.sendMessage(Component.text(message, NamedTextColor.GREEN).normalize())
+}
+
+fun Player.sendErrorMessage(message: String) {
+    this.sendMessage(Component.text(message, NamedTextColor.RED).normalize())
+}
+
+fun Player.sendSuccessActionBar(message: String) {
+    this.sendActionBar(Component.text(message, NamedTextColor.GREEN).normalize())
+}
+
+fun Player.sendErrorActionBar(message: String) {
+    this.sendActionBar(Component.text(message, NamedTextColor.RED).normalize())
 }

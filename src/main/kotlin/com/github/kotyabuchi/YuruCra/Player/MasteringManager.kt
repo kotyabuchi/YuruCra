@@ -101,7 +101,6 @@ class MasteringManager(private val player: Player) {
                 expBarRunnableMap.remove(mastering)
             }
         }.runTaskLater(main, 20 * 6L)
-        setMasteringStatus(mastering, masteringStatus)
     }
 
     fun clearExpBar() {
@@ -115,7 +114,7 @@ class MasteringManager(private val player: Player) {
     }
 
     fun getMasteringStatus(mastering: Mastering): MasteringStatus {
-        return masteringStatusMap[mastering] ?: MasteringStatus()
+        return masteringStatusMap.getOrPut(mastering) { MasteringStatus() }
     }
 
     fun getAllMasteringStatus(): List<MasteringStatus> {
