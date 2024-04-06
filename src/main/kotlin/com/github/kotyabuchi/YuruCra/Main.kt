@@ -43,6 +43,7 @@ class Main: JavaPlugin() {
             Debug,
             FallenTree,
             KeepCropAndReplant,
+            KeepFarmland,
             LevelTheFarmlandAndPath,
         )
 
