@@ -12,10 +12,7 @@ import com.github.kotyabuchi.YuruCra.Player.Command.HomeCommand
 import com.github.kotyabuchi.YuruCra.Player.Command.PlayerManageCommand
 import com.github.kotyabuchi.YuruCra.Player.PlayerManager
 import com.github.kotyabuchi.YuruCra.Player.PlayerStatus.Companion.getStatus
-import com.github.kotyabuchi.YuruCra.System.ChatSound
-import com.github.kotyabuchi.YuruCra.System.Debug
-import com.github.kotyabuchi.YuruCra.System.FallenTree
-import com.github.kotyabuchi.YuruCra.System.LevelTheFarmlandAndPath
+import com.github.kotyabuchi.YuruCra.System.*
 import org.bukkit.event.Listener
 import org.bukkit.plugin.java.JavaPlugin
 import java.io.File
@@ -45,6 +42,7 @@ class Main: JavaPlugin() {
             ChatSound,
             Debug,
             FallenTree,
+            KeepCropAndReplant,
             LevelTheFarmlandAndPath,
         )
 
