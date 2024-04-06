@@ -24,7 +24,7 @@ import java.time.Duration
 
 abstract class Mastering(val masteringName: String): Listener {
 
-    private val main: Main = Main.instance
+    protected val main: Main = Main.instance
     private val targetTool: MutableList<Material> = mutableListOf()
     private val castingPlayerList: MutableList<Player> = mutableListOf()
     private val castingCommandMap: MutableMap<Player, String> = mutableMapOf()

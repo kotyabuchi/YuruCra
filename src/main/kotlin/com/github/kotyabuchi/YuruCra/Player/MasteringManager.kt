@@ -75,14 +75,14 @@ class MasteringManager(private val player: Player) {
         }
         val exp = masteringStatus.getExp()
         val nextLevelExp = masteringStatus.getNextLevelExp()
-        val title = Component.text("$masteringName Lv.${masteringStatus.getLevel()} ${exp.floor2Digits()}/$nextLevelExp").normalize().apply {
-            if (addedExp > 0) {
-                append(Component.text(" +${addedExp.floor2Digits()} ", NamedTextColor.GREEN).normalize())
-            } else {
-                append(Component.text(" +${addedExp.floor2Digits()} ", NamedTextColor.GREEN).normalize())
-            }
-            append(Component.text(" ${combo}Combo(x${(1 + combo * 0.002).floor3Digits()})", NamedTextColor.GOLD).normalize())
+        var title = Component.text("$masteringName Lv.${masteringStatus.getLevel()} ${exp.floor2Digits()}/$nextLevelExp").normalize()
+        title = if (addedExp > 0) {
+            title.append(Component.text(" +${addedExp.floor2Digits()} ", NamedTextColor.GREEN).normalize())
+        } else {
+            title.append(Component.text(" +${addedExp.floor2Digits()} ", NamedTextColor.GREEN).normalize())
         }
+        title = title.append(Component.text(" ${combo}Combo(x${(1 + combo * 0.002).floor3Digits()})", NamedTextColor.GOLD).normalize())
+
         val progress = (exp / nextLevelExp).toFloat()
         val expBar = expBars[mastering]?.apply {
             name(title)

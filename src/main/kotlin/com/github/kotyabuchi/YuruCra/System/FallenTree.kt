@@ -1,6 +1,10 @@
 package com.github.kotyabuchi.YuruCra.System
 
+import com.github.kotyabuchi.YuruCra.Event.CustomEventCaller
+import com.github.kotyabuchi.YuruCra.Event.EntityDropItemsEvent
 import com.github.kotyabuchi.YuruCra.Main
+import com.github.kotyabuchi.YuruCra.Mastering.GatheringMastering
+import com.github.kotyabuchi.YuruCra.PersistantDataType.PersistentDataTypeUUID
 import com.github.kotyabuchi.YuruCra.Utility.BlockUtil
 import com.github.kotyabuchi.YuruCra.Utility.TreeType
 import com.github.kotyabuchi.YuruCra.Utility.isLog
@@ -10,6 +14,7 @@ import org.bukkit.block.Block
 import org.bukkit.block.data.Waterlogged
 import org.bukkit.entity.Entity
 import org.bukkit.entity.FallingBlock
+import org.bukkit.entity.Item
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.block.BlockBreakEvent
@@ -30,7 +35,7 @@ object FallenTree: Listener {
         val block = event.block
         val material = block.type
 
-        if (material.isLog()) {
+        if (!player.isSneaking && material.isLog()) {
             val world = block.world
             val treeBlocks = mutableListOf<Block>()
             val treeType = TreeType.fromMaterial(material) ?: return
@@ -44,6 +49,7 @@ object FallenTree: Listener {
                     fallingSand.blockData = it.blockData
                     fallingSand.blockState = it.state.copy()
                     fallingSand.persistentDataContainer.set(fallenTreeKey, PersistentDataType.LIST.byteArrays(), dropItems)
+                    fallingSand.persistentDataContainer.set(GatheringMastering.minerKey, PersistentDataTypeUUID, player.uniqueId)
                     if ((it.blockData as? Waterlogged)?.isWaterlogged == true) {
                         it.type = Material.WATER
                     } else {
@@ -67,11 +73,13 @@ object FallenTree: Listener {
     private fun dropItem(entity: Entity): Boolean {
         if (entity !is FallingBlock) return false
         val dropItemByteArray = entity.persistentDataContainer.get(fallenTreeKey, PersistentDataType.LIST.byteArrays()) ?: return false
+        val dropItems = mutableListOf<Item>()
 
         dropItemByteArray.forEach {
             val dropItem = ItemStack.deserializeBytes(it)
-            entity.world.dropItemNaturally(entity.location, dropItem)
+            dropItems.add(entity.world.dropItemNaturally(entity.location, dropItem))
         }
+        CustomEventCaller.callEvent(EntityDropItemsEvent(entity, dropItems))
 
         entity.remove()
         return true

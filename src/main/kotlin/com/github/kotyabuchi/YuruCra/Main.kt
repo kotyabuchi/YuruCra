@@ -5,6 +5,7 @@ import com.github.kotyabuchi.MCRPG.transactionWithLogger
 import com.github.kotyabuchi.YuruCra.Event.CustomEventCaller
 import com.github.kotyabuchi.YuruCra.Item.ItemExtensionCommand
 import com.github.kotyabuchi.YuruCra.Item.ItemExtensionManager
+import com.github.kotyabuchi.YuruCra.Mastering.MasteringType
 import com.github.kotyabuchi.YuruCra.Menu.HomeMenu.MBCreateHome
 import com.github.kotyabuchi.YuruCra.Menu.MenuController
 import com.github.kotyabuchi.YuruCra.Player.Command.HomeCommand
@@ -44,6 +45,10 @@ class Main: JavaPlugin() {
             Debug,
             FallenTree,
         )
+
+        MasteringType.values().forEach {
+            registerEvent(it.masteringClass)
+        }
 
         events.forEach {
             registerEvent(it)
