@@ -46,6 +46,14 @@ abstract class Menu(
 
     open fun createMenu() {}
 
+    fun refresh() {
+        pages.clear()
+        buttons.clear()
+        createNewPageIfNeed(0)
+        createMenu()
+        prevMenu = prevMenu
+    }
+
     private fun createNewPage() {
         val newPage = Bukkit.createInventory(null, invSize, title)
         pages.add(newPage)
@@ -58,6 +66,13 @@ abstract class Menu(
         repeat(max(0, pageNum - pages.size + 1)) {
             createNewPage()
             if (pages.size > 1) createFooter(pages.size - 2)
+        }
+    }
+
+    fun addButton(button: MenuButton) {
+        var page = 0
+        while (!addButton(page, button)) {
+            page++
         }
     }
 

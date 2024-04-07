@@ -7,8 +7,10 @@ import com.github.kotyabuchi.YuruCra.Item.ItemExtensionCommand
 import com.github.kotyabuchi.YuruCra.Item.ItemExtensionManager
 import com.github.kotyabuchi.YuruCra.Mastering.MasteringType
 import com.github.kotyabuchi.YuruCra.Menu.HomeMenu.MBCreateHome
+import com.github.kotyabuchi.YuruCra.Menu.MainMenu.MainMenuCompass
 import com.github.kotyabuchi.YuruCra.Menu.MenuController
 import com.github.kotyabuchi.YuruCra.Player.Command.HomeCommand
+import com.github.kotyabuchi.YuruCra.Player.Command.MainMenuCommand
 import com.github.kotyabuchi.YuruCra.Player.Command.PlayerManageCommand
 import com.github.kotyabuchi.YuruCra.Player.PlayerManager
 import com.github.kotyabuchi.YuruCra.Player.PlayerStatus.Companion.getStatus
@@ -26,7 +28,6 @@ class Main: JavaPlugin() {
     }
 
     private fun registerEvents() {
-        val pm = server.pluginManager
         val events: List<Listener> = listOf(
             // Event
             CustomEventCaller,
@@ -34,6 +35,7 @@ class Main: JavaPlugin() {
             ItemExtensionManager,
             // Menu
             MenuController,
+            MainMenuCompass,
             // Home
             MBCreateHome,
             // Player
@@ -64,6 +66,7 @@ class Main: JavaPlugin() {
     }
 
     private fun registerCommands() {
+        getCommand("menu")?.setExecutor(MainMenuCommand)
         getCommand("home")?.setExecutor(HomeCommand)
         getCommand("itemedit")?.setExecutor(ItemExtensionCommand)
         getCommand("debugmode")?.setExecutor(PlayerManageCommand)
