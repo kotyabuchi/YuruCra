@@ -1,6 +1,7 @@
 package com.github.kotyabuchi.YuruCra.Mastering.Gathering
 
 import com.github.kotyabuchi.YuruCra.Mastering.GatheringMastering
+import com.github.kotyabuchi.YuruCra.Mastering.Skill.Gathering.MineAssist
 import com.github.kotyabuchi.YuruCra.Utility.isPickAxe
 import org.bukkit.Material
 
@@ -30,5 +31,7 @@ object Miner: GatheringMastering("MINER") {
         addExpMap(7, Material.LAPIS_ORE, Material.DEEPSLATE_LAPIS_ORE)
         addExpMap(8, Material.DIAMOND_ORE, Material.DEEPSLATE_DIAMOND_ORE)
         addExpMap(10, Material.EMERALD_ORE, Material.DEEPSLATE_EMERALD_ORE)
+
+        registerPassiveSkill(MineAssist)
     }
 }
