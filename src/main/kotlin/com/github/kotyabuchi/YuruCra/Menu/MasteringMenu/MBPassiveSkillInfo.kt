@@ -26,9 +26,9 @@ class MBPassiveSkillInfo(private val player: Player, private val skill: PassiveS
         add(Component.text("NeedLevel: ", NamedTextColor.GRAY).append(Component.text(skill.needLevel, NamedTextColor.GOLD)))
         add(Component.text("Cost: ", NamedTextColor.GRAY).append(Component.text(skill.cost, NamedTextColor.AQUA)))
         add(Component.text("===============", NamedTextColor.GRAY))
-        add(Component.text(skill.description))
+        add(Component.text(skill.description, NamedTextColor.WHITE))
         add(Component.empty())
-        add(Component.text("Click: ").append {
+        add(Component.text("Click: ", NamedTextColor.GRAY).append {
             if (isEnabled) {
                 Component.text("Disable skill", NamedTextColor.RED)
             } else {

@@ -19,7 +19,7 @@ class MBSkillInfo(command: SkillCommand, skill: Skill): MenuButton() {
         if (skill.coolTime != 0L) add(Component.text("CoolTime: ", NamedTextColor.GRAY).append(Component.text("${skill.coolTime / 1000}s", NamedTextColor.WHITE)))
         add(Component.text("Command: ", NamedTextColor.GRAY).append(Component.text(command.name, NamedTextColor.WHITE)))
         add(Component.text("===============", NamedTextColor.GRAY))
-        add(Component.text(skill.description))
+        add(Component.text(skill.description, NamedTextColor.WHITE))
     }
     override val clickSound: ClickSound? = null
 }
