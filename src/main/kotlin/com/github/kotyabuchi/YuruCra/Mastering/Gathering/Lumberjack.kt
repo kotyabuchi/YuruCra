@@ -1,6 +1,7 @@
 package com.github.kotyabuchi.YuruCra.Mastering.Gathering
 
 import com.github.kotyabuchi.YuruCra.Mastering.GatheringMastering
+import com.github.kotyabuchi.YuruCra.Mastering.Skill.Gathering.FallenTree
 import com.github.kotyabuchi.YuruCra.Utility.isAxe
 import com.github.kotyabuchi.YuruCra.Utility.isLog
 import org.bukkit.Material
@@ -17,9 +18,7 @@ object Lumberjack: GatheringMastering("LUMBERJACK") {
             if (it.isLog()) addExpMap(1, it)
         }
 
-        println("Tool is ${getTool().joinToString { it.name }}")
-//        registerSkill(SkillCommand.LRL, TreeAssist)
-//        registerPassiveSkill(AutoReplantSapling(this))
+        registerPassiveSkill(FallenTree)
     }
 
     @EventHandler

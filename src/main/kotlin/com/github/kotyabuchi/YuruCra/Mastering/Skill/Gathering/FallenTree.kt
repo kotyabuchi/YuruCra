@@ -1,9 +1,13 @@
-package com.github.kotyabuchi.YuruCra.System
+package com.github.kotyabuchi.YuruCra.Mastering.Skill.Gathering
 
+import com.github.kotyabuchi.YuruCra.Event.BlockMineEvent
 import com.github.kotyabuchi.YuruCra.Event.CustomEventCaller
 import com.github.kotyabuchi.YuruCra.Event.EntityDropItemsEvent
 import com.github.kotyabuchi.YuruCra.Main
+import com.github.kotyabuchi.YuruCra.Mastering.Gathering.Lumberjack
 import com.github.kotyabuchi.YuruCra.Mastering.GatheringMastering
+import com.github.kotyabuchi.YuruCra.Mastering.Mastering
+import com.github.kotyabuchi.YuruCra.Mastering.Skill.PassiveSkill
 import com.github.kotyabuchi.YuruCra.PersistantDataType.PersistentDataTypeUUID
 import com.github.kotyabuchi.YuruCra.Utility.BlockUtil
 import com.github.kotyabuchi.YuruCra.Utility.TreeType
@@ -16,20 +20,29 @@ import org.bukkit.entity.Entity
 import org.bukkit.entity.FallingBlock
 import org.bukkit.entity.Item
 import org.bukkit.event.EventHandler
-import org.bukkit.event.Listener
-import org.bukkit.event.block.BlockBreakEvent
+import org.bukkit.event.EventPriority
 import org.bukkit.event.entity.EntityChangeBlockEvent
 import org.bukkit.event.entity.EntityDropItemEvent
 import org.bukkit.inventory.ItemStack
 import org.bukkit.persistence.PersistentDataType
+import java.util.*
 
-object FallenTree: Listener {
+object FallenTree: PassiveSkill {
+    override val ownerMastering: Mastering = Lumberjack
+    override val main: Main = Main.instance
+    override val skillName: String = "FALLEN_TREE"
+    override val displayName: String = "Fallen Tree"
+    override val cost: Int = 0
+    override val needLevel: Int = 0
+    override var description: String = "破壊したブロックより上の木を崩壊させる"
+    override val coolTime: Long = 0
+    override val lastUseTime: MutableMap<UUID, Long> = mutableMapOf()
 
-    private val main: Main = Main.instance
     private val fallenTreeKey = NamespacedKey(main, "fallenTree")
 
-    @EventHandler
-    fun onBreak(event: BlockBreakEvent) {
+    @EventHandler(priority = EventPriority.HIGH)
+    fun onBreak(event: BlockMineEvent) {
+        if (event.isCancelled) return
         val player = event.player
         val toolItemStack = player.inventory.itemInMainHand
         val block = event.block

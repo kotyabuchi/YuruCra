@@ -43,7 +43,6 @@ class Main: JavaPlugin() {
             // System
             ChatSound,
             Debug,
-            FallenTree,
             KeepCropAndReplant,
             KeepFarmland,
             LevelTheFarmlandAndPath,

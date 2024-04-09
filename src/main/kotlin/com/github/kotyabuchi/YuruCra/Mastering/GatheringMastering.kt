@@ -75,7 +75,7 @@ open class GatheringMastering(masteringName: String): Mastering(masteringName) {
             if (placedBlock.containsKey(block)) {
                 removePlacedBlock(block)
             } else {
-                CustomEventCaller.callEvent(GatheringItemDropEvent(event.blockState.type, event.items, event.player))
+                CustomEventCaller.callEvent(GatheringItemDropEvent(this, event.blockState.type, event.items, event.player))
             }
         }
     }
@@ -89,11 +89,12 @@ open class GatheringMastering(masteringName: String): Mastering(masteringName) {
         val minerUUID = pdc.get(minerKey, PersistentDataTypeUUID) ?: return
         val player = main.server.getPlayer(minerUUID) ?: return
 
-        CustomEventCaller.callEvent(GatheringItemDropEvent(blockState.type, event.dropItems, player))
+        CustomEventCaller.callEvent(GatheringItemDropEvent(this, blockState.type, event.dropItems, player))
     }
 
     @EventHandler
     fun onGatheringItemDrop(event: GatheringItemDropEvent) {
+        if (event.mastering != this) return
         val player = event.player
         val masteringManager = player.getStatus().masteringManager
 
