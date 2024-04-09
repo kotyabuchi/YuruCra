@@ -1,7 +1,10 @@
 package com.github.kotyabuchi.YuruCra.Player
 
+import com.github.kotyabuchi.YuruCra.Main
 import com.github.kotyabuchi.YuruCra.Menu.Menu
+import org.bukkit.NamespacedKey
 import org.bukkit.entity.Player
+import org.bukkit.persistence.PersistentDataType
 import java.time.LocalDateTime
 
 class PlayerStatus(private val player: Player): Player by player {
@@ -14,11 +17,24 @@ class PlayerStatus(private val player: Player): Player by player {
         }
     }
 
+    private val main: Main = Main.instance
     var playTime: Long = 0
     var lastLogin: LocalDateTime = LocalDateTime.now()
     val loginTime: LocalDateTime = LocalDateTime.now()
     var lastPlayVersion: Double = 0.0
-    var isDebugMode: Boolean = false
+    private val debugModeKey = NamespacedKey(main, "DebugMode")
+    private val pdc = player.persistentDataContainer
+    var isDebugMode: Boolean
+        get() {
+            return pdc.has(debugModeKey)
+        }
+        set(value) {
+            if (value) {
+                pdc.set(debugModeKey, PersistentDataType.BOOLEAN, true)
+            } else {
+                pdc.remove(debugModeKey)
+            }
+        }
 
     // MenuSystem
     val menuStatus: MenuStatus = MenuStatus()
