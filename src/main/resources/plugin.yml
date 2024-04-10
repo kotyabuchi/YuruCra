@@ -5,6 +5,10 @@ author: kotyabuchi
 api-version: '1.20'
 commands:
   menu:
+    usage: /<command>
   home:
+    usage: /<command>
   itemedit:
-  debugmode:
+    usage: /<command> player damage <value>
+  playermanager:
+    aliases: [pm]

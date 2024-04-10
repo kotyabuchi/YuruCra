@@ -68,7 +68,7 @@ class Main: JavaPlugin() {
         getCommand("menu")?.setExecutor(MainMenuCommand)
         getCommand("home")?.setExecutor(HomeCommand)
         getCommand("itemedit")?.setExecutor(ItemExtensionCommand)
-        getCommand("debugmode")?.setExecutor(PlayerManageCommand)
+        getCommand("playermanager")?.setExecutor(PlayerManageCommand)
     }
 
     override fun onEnable() {
