@@ -2,6 +2,7 @@ package com.github.kotyabuchi.YuruCra.Menu.Button
 
 import com.github.kotyabuchi.YuruCra.Menu.ButtonClickInfo
 import net.kyori.adventure.text.TextComponent
+import net.kyori.adventure.text.format.NamedTextColor
 import net.kyori.adventure.text.format.TextDecoration
 import org.bukkit.Material
 import org.bukkit.Sound
@@ -18,10 +19,12 @@ abstract class MenuButton {
         ItemStack(material, amount).apply {
             editMeta { meta ->
                 displayName?.let {
+                    if (it.color() != null) it.color(NamedTextColor.WHITE)
                     meta.displayName(it.decoration(TextDecoration.ITALIC, false))
                 }
                 meta.lore(
                     this@MenuButton.lore.map {
+                        if (it.color() != null) it.color(NamedTextColor.WHITE)
                         it.decoration(TextDecoration.ITALIC, false)
                     }
                 )

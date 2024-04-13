@@ -4,6 +4,7 @@ import com.github.kotyabuchi.YuruCra.Menu.FrameType
 import com.github.kotyabuchi.YuruCra.Menu.HomeMenu.MBShowHome
 import com.github.kotyabuchi.YuruCra.Menu.MasteringMenu.MBShowMastering
 import com.github.kotyabuchi.YuruCra.Menu.Menu
+import com.github.kotyabuchi.YuruCra.Menu.ResourceStorageMenu.MBResourceStorage
 import net.kyori.adventure.text.Component
 
 object MainMenu: Menu(
@@ -17,5 +18,6 @@ object MainMenu: Menu(
     override fun createMenu() {
         addButton(MBShowHome)
         addButton(MBShowMastering)
+        addButton(MBResourceStorage)
     }
 }

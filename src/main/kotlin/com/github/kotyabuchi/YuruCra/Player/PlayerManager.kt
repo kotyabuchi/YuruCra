@@ -6,6 +6,9 @@ import com.github.kotyabuchi.YuruCra.Main
 import com.github.kotyabuchi.YuruCra.Mastering.MasteringType
 import com.github.kotyabuchi.YuruCra.Mastering.TMasteringStatus
 import com.github.kotyabuchi.YuruCra.Player.PlayerStatus.Companion.getStatus
+import com.github.kotyabuchi.YuruCra.System.ResourceStorage.TResourceStorageStatus
+import com.github.kotyabuchi.YuruCra.System.ResourceStorage.TStoredResources
+import com.github.kotyabuchi.YuruCra.valueOfOrNull
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.NamedTextColor
 import org.bukkit.Location
@@ -14,6 +17,7 @@ import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.player.PlayerJoinEvent
 import org.bukkit.event.player.PlayerQuitEvent
+import org.bukkit.inventory.ItemStack
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import java.time.LocalDateTime
@@ -27,9 +31,13 @@ object PlayerManager: Listener {
 
     init {
         transactionWithLogger {
-            SchemaUtils.create(TPlayerStatus)
-            SchemaUtils.create(TPlayerHomes)
-            SchemaUtils.create(TMasteringStatus)
+            SchemaUtils.create(
+                TPlayerStatus,
+                TPlayerHomes,
+                TMasteringStatus,
+                TStoredResources,
+                TResourceStorageStatus,
+            )
 
             main.server.onlinePlayers.forEach {
                 loadPlayerData(it.getStatus())
@@ -108,6 +116,17 @@ object PlayerManager: Listener {
                 player.masteringManager.getMasteringStatus(masteringType.masteringClass).setTotalExp(it[TMasteringStatus.totalExp])
             }
         }
+        TResourceStorageStatus.select { TResourceStorageStatus.uuid eq uuidStr }.singleOrNull()?.let {
+            val resourceStorage = player.resourceStorage
+            resourceStorage.slotSize = it[TResourceStorageStatus.unlockedSlotSize]
+            resourceStorage.autoStore = it[TResourceStorageStatus.autoStore]
+        }
+        TStoredResources.select { TStoredResources.uuid eq uuidStr }.forEach {
+            valueOfOrNull<Material>(it[TStoredResources.resourceName])?.let { material ->
+                val resource = ItemStack(material, it[TStoredResources.amount])
+                player.resourceStorage.storeResource(resource)
+            }
+        }
     }
 
     fun savePlayerData(player: PlayerStatus) {
@@ -141,6 +160,39 @@ object PlayerManager: Listener {
                     it[masteringId] = masteringType.id
                     it[uuid] = uuidStr
                     it[totalExp] = masteringStatus.getTotalExp()
+                }
+            }
+        }
+
+        val resourceStorage = player.resourceStorage
+        val resourceStorageStatusCondition = TResourceStorageStatus.uuid eq uuidStr
+        val resourceStorageStatusExists = TResourceStorageStatus.select { resourceStorageStatusCondition }.singleOrNull() != null
+        if (resourceStorageStatusExists) {
+            TResourceStorageStatus.update({ resourceStorageStatusCondition }) {
+                it[unlockedSlotSize] = resourceStorage.slotSize
+                it[autoStore] = resourceStorage.autoStore
+            }
+        } else {
+            TResourceStorageStatus.insert {
+                it[uuid] = uuidStr
+                it[unlockedSlotSize] = resourceStorage.slotSize
+                it[autoStore] = resourceStorage.autoStore
+            }
+        }
+
+        resourceStorage.getStoredResources().forEach { (resource, amount) ->
+            val resourceName = resource.name
+            val storedResourceCondition = (TStoredResources.uuid eq uuidStr) and (TStoredResources.resourceName eq resourceName)
+            val storedResourceExists = TStoredResources.select { storedResourceCondition }.singleOrNull() != null
+            if (storedResourceExists) {
+                TStoredResources.update({ storedResourceCondition }) {
+                    it[this.amount] = amount
+                }
+            } else {
+                TStoredResources.insert {
+                    it[this.uuid] = uuidStr
+                    it[this.resourceName] = resourceName
+                    it[this.amount] = amount
                 }
             }
         }

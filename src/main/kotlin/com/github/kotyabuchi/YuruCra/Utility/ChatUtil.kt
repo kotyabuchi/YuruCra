@@ -4,6 +4,7 @@ import com.github.kotyabuchi.MCRPG.normalize
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.NamedTextColor
 import org.bukkit.entity.Player
+import kotlin.math.ceil
 import kotlin.math.floor
 
 fun String.upperCamelCase(): String {
@@ -18,6 +19,14 @@ fun String.upperCamelCase(): String {
             result.trim()
         }
     }
+}
+
+fun Double.floorToInt(): Int {
+    return floor(this).toInt()
+}
+
+fun Double.ceilToInt(): Int {
+    return ceil(this).toInt()
 }
 
 fun Double.floor1Digits(): Double {

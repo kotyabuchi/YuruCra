@@ -2,6 +2,7 @@ package com.github.kotyabuchi.YuruCra.Player
 
 import com.github.kotyabuchi.YuruCra.Main
 import com.github.kotyabuchi.YuruCra.Menu.Menu
+import com.github.kotyabuchi.YuruCra.System.ResourceStorage.ResourceStorage
 import org.bukkit.NamespacedKey
 import org.bukkit.entity.Player
 import org.bukkit.persistence.PersistentDataType
@@ -39,8 +40,8 @@ class PlayerStatus(private val player: Player): Player by player {
     // MenuSystem
     val menuStatus: MenuStatus = MenuStatus()
 
-    fun openMenu(menu: Menu, page: Int = 0) {
-        if (menuStatus.openingMenu?.prevMenu != menu) {
+    fun openMenu(menu: Menu, page: Int = 0, forceOpen: Boolean = false) {
+        if (!forceOpen && menuStatus.openingMenu?.prevMenu != menu) {
             if (menuStatus.openingMenu != menu) {
                 menu.prevMenu = menuStatus.openingMenu
             }
@@ -61,4 +62,7 @@ class PlayerStatus(private val player: Player): Player by player {
 
     // MasteringSystem
     val masteringManager: MasteringManager = MasteringManager(player)
+
+    // ResourceStorage
+    val resourceStorage: ResourceStorage = ResourceStorage()
 }

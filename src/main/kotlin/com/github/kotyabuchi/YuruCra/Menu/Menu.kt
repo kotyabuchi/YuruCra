@@ -23,11 +23,11 @@ abstract class Menu(
     var prevMenu: Menu? = null
         set(value) {
             if (value == null) {
-                (0 until pages.size).forEach { page ->
+                (0 .. getLastPageNum()).forEach { page ->
                     setButton(page, invSize - 8, MBBlank())
                 }
             } else {
-                (0 until pages.size).forEach { page ->
+                (0 .. getLastPageNum()).forEach { page ->
                     setButton(page, invSize - 8, MBPrevMenu(value))
                 }
             }
@@ -69,6 +69,10 @@ abstract class Menu(
         }
     }
 
+    fun getLastPageNum(): Int {
+        return pages.size - 1
+    }
+
     fun addButton(button: MenuButton) {
         var page = 0
         while (!addButton(page, button)) {
@@ -89,6 +93,10 @@ abstract class Menu(
         return result
     }
 
+    fun fillButton(pageNum: Int, button: MenuButton) {
+        while (addButton(pageNum, button)) {}
+    }
+
     fun setButton(pageNum: Int, slot: Int, button: MenuButton) {
         createNewPageIfNeed(pageNum)
         buttons[pageNum][slot] = button
@@ -100,7 +108,7 @@ abstract class Menu(
         return buttons[pageNum][slot]
     }
 
-    open fun createFooter(pageNum: Int = pages.size - 1) {
+    open fun createFooter(pageNum: Int = getLastPageNum()) {
         val startSlot = invSize - 9
         (0 until 9).forEach {
             setButton(pageNum, startSlot + it, MBBlank())
@@ -114,7 +122,7 @@ abstract class Menu(
         }
     }
 
-    open fun createFrame(pageNum: Int = pages.size - 1) {
+    open fun createFrame(pageNum: Int = getLastPageNum()) {
         if (hasTopFrame) {
             (0 until 9).forEach {
                 setButton(pageNum, it, MBBlank())
