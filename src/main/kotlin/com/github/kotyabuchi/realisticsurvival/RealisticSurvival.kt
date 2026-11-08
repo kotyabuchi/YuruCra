@@ -5,6 +5,13 @@ import com.github.kotyabuchi.realisticsurvival.block.PlacedBlockTracker
 import com.github.kotyabuchi.realisticsurvival.block.SafeCropAndReplant
 import com.github.kotyabuchi.realisticsurvival.command.RsCommand
 import com.github.kotyabuchi.realisticsurvival.data.Database
+import com.github.kotyabuchi.realisticsurvival.feature.ChatSound
+import com.github.kotyabuchi.realisticsurvival.feature.Elevator
+import com.github.kotyabuchi.realisticsurvival.feature.FarmlandCare
+import com.github.kotyabuchi.realisticsurvival.feature.SpawnerUpgrade
+import com.github.kotyabuchi.realisticsurvival.feature.StarterItems
+import com.github.kotyabuchi.realisticsurvival.feature.StoneGenerator
+import com.github.kotyabuchi.realisticsurvival.feature.WorldProtection
 import com.github.kotyabuchi.realisticsurvival.job.JobProgress
 import com.github.kotyabuchi.realisticsurvival.job.JobRegistry
 import com.github.kotyabuchi.realisticsurvival.job.JobType
@@ -65,6 +72,9 @@ class RealisticSurvival : JavaPlugin() {
         registerListeners(
             players, resourceStorage, breakContext, placedBlocks, safeCrop, menus,
             SkillCaster(this), MenuCompass(this),
+            // 便利機能
+            Elevator(), WorldProtection(), StoneGenerator(this), SpawnerUpgrade(),
+            FarmlandCare(this), ChatSound(this), StarterItems(),
         )
         jobs.registerListeners()
         RsCommand.register(this)
