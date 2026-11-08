@@ -25,6 +25,17 @@ dependencies {
     // 以下はjarに同梱せず、plugin.yml の libraries でサーバーにダウンロードさせる
     compileOnly(kotlin("stdlib"))
     compileOnly("org.xerial:sqlite-jdbc:$sqliteVersion")
+
+    // テストはサーバーなしで動く純粋なロジックだけを対象にする
+    testImplementation(kotlin("stdlib"))
+    testImplementation(kotlin("test"))
+    testImplementation("io.papermc.paper:paper-api:$paperApiVersion")
+    testImplementation(platform("org.junit:junit-bom:5.12.2"))
+    testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+}
+
+tasks.test {
+    useJUnitPlatform()
 }
 
 kotlin {
