@@ -1,0 +1,9 @@
+name: RealisticSurvival
+version: '${version}'
+main: com.github.kotyabuchi.realisticsurvival.RealisticSurvival
+api-version: '${apiVersion}'
+description: ジョブ・スキル・ホーム・リソースストレージを追加するサバイバル拡張
+author: kotyabuchi
+libraries:
+  - org.jetbrains.kotlin:kotlin-stdlib:${kotlinVersion}
+  - org.xerial:sqlite-jdbc:${sqliteVersion}
