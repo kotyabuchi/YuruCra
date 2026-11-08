@@ -43,7 +43,7 @@ class MultiBreak(
         val radius = radius(owner.level(player))
         val targets = area(block, face, radius).filter { it != block && it.canHarvestWith(item) && it.isSkillBreakable() }
 
-        plugin.breakContext.breakBlocks(player, BreakSource(block, isMultiBreak = true), targets)
+        plugin.breakContext.breakBlocks(player, BreakSource(block, isMultiBreak = true), targets, originEvent = event)
         plugin.server.pluginManager.callEvent(MultiBreakEvent(player, block, face, owner))
     }
 

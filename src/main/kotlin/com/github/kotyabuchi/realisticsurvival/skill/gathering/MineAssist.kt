@@ -34,7 +34,7 @@ class MineAssist(plugin: RealisticSurvival) : ToggleSkill(plugin) {
         ores.remove(block)
         val source = BreakSource(block, isMultiBreak = context?.isMultiBreak ?: false, isMineAssist = true)
         plugin.breakContext.tagOrigin(block, source)
-        val broken = plugin.breakContext.breakBlocks(player, source, ores)
+        val broken = plugin.breakContext.breakBlocks(player, source, ores, originEvent = event)
         player.foodLevel = max(0, player.foodLevel - ceil(broken / 10.0).toInt())
     }
 

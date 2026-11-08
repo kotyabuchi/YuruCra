@@ -4,12 +4,12 @@ import com.github.kotyabuchi.realisticsurvival.RealisticSurvival
 import com.github.kotyabuchi.realisticsurvival.block.BreakSource
 import com.github.kotyabuchi.realisticsurvival.job.Job
 import com.github.kotyabuchi.realisticsurvival.skill.ToolLinkedSkill
-import com.github.kotyabuchi.realisticsurvival.util.AROUND_FACES
 import com.github.kotyabuchi.realisticsurvival.util.ToolType
 import com.github.kotyabuchi.realisticsurvival.util.WoodType
 import com.github.kotyabuchi.realisticsurvival.util.isLeaves
 import com.github.kotyabuchi.realisticsurvival.util.isTreeSoil
 import com.github.kotyabuchi.realisticsurvival.util.isWood
+import com.github.kotyabuchi.realisticsurvival.util.neighbors27
 import com.github.kotyabuchi.realisticsurvival.util.runLater
 import com.github.kotyabuchi.realisticsurvival.util.woodType
 import org.bukkit.Material
@@ -27,7 +27,7 @@ import kotlin.math.ceil
 import kotlin.math.max
 
 /**
- * 発動後6秒間、原木を斧で壊すと木全体をまとめて伐採する。葉は上から順に落ちてくる。
+ * 発動後6秒間、原木を斧で壊すと木全体をまとめて伐採する。葉は下から順に落ちてくる。
  * 斧を持ち替えるとオフになる。
  */
 class TreeAssist(plugin: RealisticSurvival, private val owner: Job) : ToolLinkedSkill(plugin) {
@@ -52,13 +52,12 @@ class TreeAssist(plugin: RealisticSurvival, private val owner: Job) : ToolLinked
         restartActiveTime(player, owner.level(player))
 
         val woodType = block.type.woodType()
-        val root = findRoot(block, woodType, HashSet()) ?: return
-        val woods = mutableListOf<Block>()
-        val leaves = LinkedHashSet<Block>()
-        collectTree(root, woodType, root, woods, leaves, HashSet())
+        val root = findRoot(block, woodType) ?: return
+        val (woods, edgeLeaves) = collectWoods(root, woodType)
         woods.remove(block)
+        val leaves = collectLeaves(edgeLeaves)
 
-        val broken = plugin.breakContext.breakBlocks(player, BreakSource(block), woods)
+        val broken = plugin.breakContext.breakBlocks(player, BreakSource(block), woods, originEvent = event)
         player.foodLevel = max(0, player.foodLevel - ceil(broken / 20.0).toInt())
         dropLeaves(leaves)
     }
@@ -79,72 +78,93 @@ class TreeAssist(plugin: RealisticSurvival, private val owner: Job) : ToolLinked
         falling.remove()
     }
 
+    /** 葉を高さごとにまとめ、下の段から1tickずつずらして落とす（1段につきタスク1つ） */
     private fun dropLeaves(leaves: Collection<Block>) {
         if (leaves.isEmpty()) return
         val lowest = leaves.minOf { it.y }
-        leaves.forEach { leaf ->
-            plugin.runLater((leaf.y - lowest).toLong()) {
-                if (!leaf.type.isLeaves()) return@runLater
-                val falling = leaf.world.spawnFallingBlock(leaf.location.toCenterLocation(), leaf.blockData)
-                falling.dropItem = false
-                falling.isPersistent = false
-                falling.persistentDataContainer.set(fallingLeafKey, PersistentDataType.BYTE, 1)
-                leaf.setType(Material.AIR, false)
+        leaves.groupBy { it.y }.forEach { (y, layer) ->
+            plugin.runLater((y - lowest).toLong()) {
+                layer.forEach { leaf ->
+                    if (!leaf.type.isLeaves()) return@forEach
+                    val falling = leaf.world.spawnFallingBlock(leaf.location.toCenterLocation(), leaf.blockData)
+                    falling.dropItem = false
+                    falling.isPersistent = false
+                    falling.persistentDataContainer.set(fallingLeafKey, PersistentDataType.BYTE, 1)
+                    leaf.setType(Material.AIR, false)
+                }
             }
         }
     }
 
-    /** 下にたどって、土の上に立っている根元の原木を探す */
-    private fun findRoot(check: Block, woodType: WoodType, checked: MutableSet<Block>): Block? {
-        if (!checked.add(check) || checked.size > SEARCH_LIMIT) return null
-        val material = check.type
-        if (!material.isWood() || material.woodType() != woodType) return null
-        val below = check.getRelative(BlockFace.DOWN)
-        if (below.type.isTreeSoil()) return check
-        for (face in AROUND_FACES) findRoot(below.getRelative(face), woodType, checked)?.let { return it }
-        for (face in AROUND_FACES) findRoot(check.getRelative(face), woodType, checked)?.let { return it }
+    /** 壊した原木から近い順にたどって、土の上に立っている根元の原木を探す */
+    private fun findRoot(start: Block, woodType: WoodType): Block? {
+        val queue = ArrayDeque(listOf(start))
+        val checked = hashSetOf(start)
+        while (queue.isNotEmpty() && checked.size < SEARCH_LIMIT) {
+            val current = queue.removeFirst()
+            if (current.getRelative(BlockFace.DOWN).type.isTreeSoil()) return current
+            for (next in current.neighbors27()) {
+                // 根元は下にあるので、上方向へはたどらない
+                if (next.y > current.y || !checked.add(next)) continue
+                if (next.isWoodOf(woodType)) queue += next
+            }
+        }
         return null
     }
 
-    /** 根元から上につながる原木と、その木に付いている葉を集める */
-    private fun collectTree(
-        root: Block,
-        woodType: WoodType,
-        check: Block,
-        woods: MutableList<Block>,
-        leaves: MutableSet<Block>,
-        checked: MutableSet<Block>,
-    ) {
-        if (!checked.add(check)) return
-        if (check.y < root.y) return
-        val material = check.type
-        if (!material.isWood()) {
-            if (material.isLeaves()) collectLeaves(check, check, material.woodType(), leaves)
-            return
+    /**
+     * 根元から上につながる原木を集める。
+     * あわせて、原木に接している葉（葉をたどる起点）も返す。
+     */
+    private fun collectWoods(root: Block, woodType: WoodType): Pair<MutableList<Block>, List<Block>> {
+        val woods = mutableListOf(root)
+        val edgeLeaves = mutableListOf<Block>()
+        val queue = ArrayDeque(listOf(root))
+        val checked = hashSetOf(root)
+        while (queue.isNotEmpty() && checked.size < SEARCH_LIMIT) {
+            val current = queue.removeFirst()
+            for (next in current.neighbors27()) {
+                if (next.y < root.y || !checked.add(next)) continue
+                when {
+                    next.isWoodOf(woodType) -> {
+                        woods += next
+                        queue += next
+                    }
+                    next.type.isLeaves() -> edgeLeaves += next
+                }
+            }
         }
-        if (material.woodType() != woodType) return
-        woods += check
-        if (checked.size > SEARCH_LIMIT) return
-        for (dy in intArrayOf(1, 0, -1)) {
-            val layer = check.getRelative(0, dy, 0)
-            for (face in AROUND_FACES) collectTree(root, woodType, layer.getRelative(face), woods, leaves, checked)
-        }
+        return woods to edgeLeaves
     }
 
-    /** 原木から遠ざかる方向（distance が増える方向）にだけ葉をたどる。プレイヤーが置いた葉は対象外 */
-    private fun collectLeaves(before: Block, check: Block, woodType: WoodType, leaves: MutableSet<Block>) {
-        if (check in leaves || leaves.size > SEARCH_LIMIT) return
-        val material = check.type
-        if (!material.isLeaves() || material.woodType() != woodType) return
-        val data = check.blockData as? Leaves ?: return
-        if (data.isPersistent) return
-        val beforeData = before.blockData
-        if (before != check && beforeData is Leaves && beforeData.distance >= data.distance) return
-        leaves += check
-        for (dy in intArrayOf(1, 0, -1)) {
-            val layer = check.getRelative(0, dy, 0)
-            for (face in AROUND_FACES) collectLeaves(check, layer.getRelative(face), woodType, leaves)
+    /**
+     * 原木から遠ざかる方向（葉の distance が増える方向）にだけ葉をたどる。
+     * プレイヤーが置いた葉（persistent）と、別の種類の木の葉は対象外。
+     */
+    private fun collectLeaves(edgeLeaves: List<Block>): Set<Block> {
+        val leaves = LinkedHashSet<Block>()
+        val queue = ArrayDeque<Block>()
+        edgeLeaves.filter { it.isNaturalLeaf() }.forEach { if (leaves.add(it)) queue += it }
+        while (queue.isNotEmpty() && leaves.size < SEARCH_LIMIT) {
+            val current = queue.removeFirst()
+            val currentData = current.blockData as Leaves
+            val woodType = current.type.woodType()
+            for (next in current.neighbors27()) {
+                if (next in leaves || !next.isNaturalLeaf() || next.type.woodType() != woodType) continue
+                if ((next.blockData as Leaves).distance <= currentData.distance) continue
+                leaves += next
+                queue += next
+            }
         }
+        return leaves
+    }
+
+    private fun Block.isWoodOf(woodType: WoodType): Boolean = type.isWood() && type.woodType() == woodType
+
+    private fun Block.isNaturalLeaf(): Boolean {
+        if (!type.isLeaves()) return false
+        val data = blockData as? Leaves ?: return false
+        return !data.isPersistent
     }
 
     companion object {
