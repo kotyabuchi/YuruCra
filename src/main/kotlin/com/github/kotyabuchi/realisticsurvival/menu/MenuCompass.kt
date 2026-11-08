@@ -36,8 +36,9 @@ class MenuCompass(private val plugin: RealisticSurvival) : Listener {
         }
     }
 
+    // インベントリのクリックのたびに呼ばれるので、素材の比較（軽い）を先にしてからPDCを読む
     private fun isCompass(item: ItemStack?): Boolean =
-        item != null && !item.isEmpty && item.persistentDataContainer.has(key, PersistentDataType.BYTE)
+        item != null && item.type == Material.COMPASS && item.persistentDataContainer.has(key, PersistentDataType.BYTE)
 
     private fun openMainMenu(player: Player) = plugin.menus.open(player, MainMenu(plugin))
 

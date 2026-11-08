@@ -9,7 +9,6 @@ import org.bukkit.entity.Player
 import org.bukkit.inventory.Inventory
 import org.bukkit.inventory.ItemFlag
 import org.bukkit.inventory.ItemStack
-import kotlin.random.Random
 
 /** バニラのタグで判定するので、銅ツールなど新しい道具にも自動で対応する */
 enum class ToolType(private val tag: Tag<Material>) {
@@ -59,21 +58,5 @@ fun fillBlockCandidates(block: Block): List<Material> = buildList {
         addAll(ground); addAll(underground)
     } else {
         addAll(underground); addAll(ground)
-    }
-}
-
-/** 重み付きの抽選表 */
-class WeightedTable<T>(vararg entries: Pair<T, Int>) {
-    private val entries = entries.toList()
-    private val total = this.entries.sumOf { it.second }
-
-    fun pick(random: Random = Random): T? {
-        if (total <= 0) return null
-        var roll = random.nextInt(total)
-        for ((value, weight) in entries) {
-            roll -= weight
-            if (roll < 0) return value
-        }
-        return null
     }
 }

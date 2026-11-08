@@ -4,7 +4,7 @@ import com.github.kotyabuchi.realisticsurvival.RealisticSurvival
 import com.github.kotyabuchi.realisticsurvival.player.JobStatus
 import com.github.kotyabuchi.realisticsurvival.skill.ToggleSkill
 import com.github.kotyabuchi.realisticsurvival.util.floorDigits
-import com.github.kotyabuchi.realisticsurvival.util.runLater
+import com.github.kotyabuchi.realisticsurvival.util.runTimer
 import com.github.kotyabuchi.realisticsurvival.util.sendSuccess
 import net.kyori.adventure.bossbar.BossBar
 import net.kyori.adventure.text.Component
@@ -12,19 +12,28 @@ import net.kyori.adventure.text.format.NamedTextColor
 import net.kyori.adventure.title.Title
 import org.bukkit.Sound
 import org.bukkit.entity.Player
-import org.bukkit.scheduler.BukkitTask
 import java.time.Duration
 import java.util.EnumMap
 import java.util.UUID
 
-/** ジョブ経験値の付与・レベルアップ通知・経験値バーの表示 */
+/**
+ * ジョブ経験値の付与・レベルアップ通知・経験値バーの表示。
+ *
+ * 経験値バーは「最後に経験値を得てから6秒」で消え、同時にコンボがリセットされる。
+ * 経験値を得るたびにタスクを作り直すと、一括破壊×人数分のタスクが生まれるので、
+ * 消す時刻だけを記録して、1つのタイマーでまとめて確認する。
+ */
 class JobProgress(private val plugin: RealisticSurvival) {
 
-    private class ShownBar(val bar: BossBar) {
-        var hideTask: BukkitTask? = null
+    private class ShownBar(val bar: BossBar, val status: JobStatus) {
+        var hideAtTick: Int = 0
     }
 
     private val bars = HashMap<UUID, EnumMap<JobType, ShownBar>>()
+
+    init {
+        plugin.runTimer(CHECK_INTERVAL_TICKS, CHECK_INTERVAL_TICKS) { hideExpiredBars() }
+    }
 
     fun addExp(player: Player, job: Job, point: Double, increaseCombo: Int = 1) {
         val status = plugin.players.status(player).job(job.type)
@@ -39,10 +48,7 @@ class JobProgress(private val plugin: RealisticSurvival) {
     }
 
     fun clear(player: Player) {
-        bars.remove(player.uniqueId)?.values?.forEach {
-            it.hideTask?.cancel()
-            player.hideBossBar(it.bar)
-        }
+        bars.remove(player.uniqueId)?.values?.forEach { player.hideBossBar(it.bar) }
     }
 
     private fun onLevelUp(player: Player, job: Job, from: Int, to: Int) {
@@ -71,21 +77,32 @@ class JobProgress(private val plugin: RealisticSurvival) {
         val progress = (status.exp / status.nextLevelExp).toFloat().coerceIn(0f, 1f)
 
         val shown = bars.getOrPut(player.uniqueId) { EnumMap(JobType::class.java) }.getOrPut(job.type) {
-            ShownBar(BossBar.bossBar(title, progress, BossBar.Color.GREEN, BossBar.Overlay.NOTCHED_10))
+            ShownBar(BossBar.bossBar(title, progress, BossBar.Color.GREEN, BossBar.Overlay.NOTCHED_10), status)
         }
         shown.bar.name(title)
         shown.bar.progress(progress)
         player.showBossBar(shown.bar)
+        shown.hideAtTick = plugin.server.currentTick + BAR_HIDE_TICKS
+    }
 
-        // しばらく経験値を得なければ、バーを消してコンボをリセットする
-        shown.hideTask?.cancel()
-        shown.hideTask = plugin.runLater(BAR_HIDE_TICKS) {
-            status.resetCombo()
-            player.hideBossBar(shown.bar)
+    private fun hideExpiredBars() {
+        val now = plugin.server.currentTick
+        val emptyPlayers = mutableListOf<UUID>()
+        bars.forEach { (uuid, jobBars) ->
+            val player = plugin.server.getPlayer(uuid)
+            jobBars.values.removeIf { shown ->
+                if (player != null && shown.hideAtTick > now) return@removeIf false
+                shown.status.resetCombo()
+                player?.hideBossBar(shown.bar)
+                true
+            }
+            if (jobBars.isEmpty()) emptyPlayers += uuid
         }
+        emptyPlayers.forEach { bars.remove(it) }
     }
 
     companion object {
-        private const val BAR_HIDE_TICKS = 20 * 6L
+        private const val BAR_HIDE_TICKS = 20 * 6
+        private const val CHECK_INTERVAL_TICKS = 10L
     }
 }

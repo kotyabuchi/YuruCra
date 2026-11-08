@@ -21,17 +21,22 @@ import org.bukkit.Particle
 import org.bukkit.Sound
 import org.bukkit.entity.Player
 import org.bukkit.event.inventory.InventoryClickEvent
+import org.bukkit.inventory.ItemStack
 
 /** 自分のホーム一覧。先頭にワールドスポーンとリスポーン地点が並ぶ */
-class HomeMenu(plugin: RealisticSurvival, private val player: Player) : Menu(
+class HomeMenu(
+    plugin: RealisticSurvival,
+    private val player: Player,
+    private val respawn: Location? = player.getRespawnLocation(false),
+) : Menu(
     plugin,
     text("${player.name}'s Homes"),
-    1 + (if (player.getRespawnLocation(false) != null) 1 else 0) + plugin.players.status(player).homes.size,
+    1 + (if (respawn != null) 1 else 0) + plugin.players.status(player).homes.size,
     Frame.TOP, Frame.SIDE,
 ) {
     override fun build() {
         put(HomeButton(player, Home.temporary("World Spawn", player.world.spawnLocation.apply { yaw = 0f }, Material.GRASS_BLOCK)))
-        player.getRespawnLocation(false)?.let { put(HomeButton(player, Home.temporary("Respawn Point", it.apply { yaw = 0f }, Material.RED_BED))) }
+        respawn?.let { put(HomeButton(player, Home.temporary("Respawn Point", it.clone().apply { yaw = 0f }, Material.RED_BED))) }
 
         var page = 0
         plugin.players.status(player).homes.forEach { home ->
@@ -76,13 +81,13 @@ class ChangeHomeIconMenu(plugin: RealisticSurvival, private val home: Home) :
 
     override fun build() {
         val perPage = size - 9
-        ICONS.chunked(perPage).forEachIndexed { page, materials ->
-            materials.forEachIndexed { index, material -> put(IconButton(home, material), page, index) }
+        ICONS.chunked(perPage).forEachIndexed { page, icons ->
+            icons.forEachIndexed { index, (material, icon) -> put(IconButton(home, material, icon), page, index) }
         }
     }
 
-    private class IconButton(private val home: Home, private val material: Material) :
-        MenuButton(buttonItem(material, name = null)) {
+    private class IconButton(private val home: Home, private val material: Material, icon: ItemStack) :
+        MenuButton(icon) {
         override fun onLeftClick(player: Player, event: InventoryClickEvent, menu: Menu) {
             menu.plugin.homes.changeIcon(player, home, material) {
                 menu.prevMenu?.let { prev -> menu.plugin.menus.reopen(player, prev) }
@@ -91,8 +96,11 @@ class ChangeHomeIconMenu(plugin: RealisticSurvival, private val home: Home) :
     }
 
     companion object {
-        private val ICONS: List<Material> by lazy {
-            Material.entries.filter { it.isItem && !it.isAir && !it.name.startsWith("LEGACY_") }
+        // 約1,400種類あるので、ボタン用のアイテムは最初に一度だけ作って使い回す
+        private val ICONS: List<Pair<Material, ItemStack>> by lazy {
+            Material.entries
+                .filter { it.isItem && !it.isAir && !it.name.startsWith("LEGACY_") }
+                .map { it to buttonItem(it, name = null) }
         }
     }
 }

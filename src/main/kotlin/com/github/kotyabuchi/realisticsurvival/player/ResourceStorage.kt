@@ -18,8 +18,11 @@ class ResourceStorage(slotSize: Int = DEFAULT_SLOTS) {
 
     fun amountOf(material: Material): Int = resources[material] ?: 0
 
-    /** 既に入っている素材なら true（自動収納の判定に使う） */
-    fun accepts(item: ItemStack): Boolean = isPlain(item) && item.type in resources
+    /**
+     * 既に入っている素材なら true（自動収納の判定に使う）。
+     * アイテムを拾おうとするたび（ほぼ毎tick）に呼ばれるので、軽い判定を先にする。
+     */
+    fun accepts(item: ItemStack): Boolean = item.type in resources && isPlain(item)
 
     /** @return 実際にしまった個数 */
     fun store(item: ItemStack): Int {

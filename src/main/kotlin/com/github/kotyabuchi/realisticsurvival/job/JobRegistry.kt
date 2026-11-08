@@ -28,6 +28,11 @@ class JobRegistry(private val plugin: RealisticSurvival) {
     /** その道具を使うジョブ */
     fun byTool(material: Material): Job? = jobs.values.firstOrNull { it.isJobTool(material) }
 
+    private val gatheringJobs = jobs.values.filterIsInstance<GatheringJob>()
+
+    /** どれかの採集系ジョブで経験値がもらえる素材か */
+    fun isGatheringTarget(material: Material): Boolean = gatheringJobs.any { it.isTargetMaterial(material) }
+
     fun registerListeners() {
         val pm = plugin.server.pluginManager
         jobs.values.forEach { job ->

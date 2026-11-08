@@ -22,8 +22,8 @@ class StoneReplacer(plugin: RealisticSurvival, job: GatheringJob) : PassiveSkill
     override val needLevel = 0
     override val description = "[Mine Assist]使用時に鉱石を石に置き換える"
 
-    // 経験値・ドロップ増加（HIGH）が済んでから動く
-    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+    // 経験値・ドロップ増加（NORMAL）が済んでから、ドロップを集める処理（HIGHEST）より先に動く
+    @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     fun onDrop(event: BlockDropItemEvent) {
         val player = event.player
         val source = plugin.breakContext.sourceOf(player, event.block) ?: return

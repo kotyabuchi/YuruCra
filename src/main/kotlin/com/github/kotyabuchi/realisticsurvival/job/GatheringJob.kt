@@ -1,7 +1,7 @@
 package com.github.kotyabuchi.realisticsurvival.job
 
 import com.github.kotyabuchi.realisticsurvival.RealisticSurvival
-import com.github.kotyabuchi.realisticsurvival.util.runNextTick
+import com.github.kotyabuchi.realisticsurvival.util.TickScopedMap
 import org.bukkit.Material
 import org.bukkit.Sound
 import org.bukkit.block.Block
@@ -24,8 +24,8 @@ abstract class GatheringJob(
 ) : Job(plugin, type) {
 
     private val expMap = HashMap<Material, Int>()
-    // 壊されてドロップ待ちのブロック → 壊したプレイヤー
-    private val pending = HashMap<Block, UUID>()
+    // 壊されてドロップ待ちのブロック → 壊したプレイヤー（ドロップは同じtick内に発生するので、tickが変われば捨ててよい）
+    private val pending = TickScopedMap<Block, UUID>(plugin.server)
 
     protected fun addExp(exp: Int, materials: Iterable<Material>) {
         materials.forEach { expMap[it] = exp }
@@ -33,7 +33,9 @@ abstract class GatheringJob(
 
     protected fun addExp(exp: Int, vararg materials: Material) = addExp(exp, materials.asIterable())
 
-    fun isTargetBlock(block: Block): Boolean = block.type in expMap
+    fun isTargetMaterial(material: Material): Boolean = material in expMap
+
+    fun isTargetBlock(block: Block): Boolean = isTargetMaterial(block.type)
 
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     fun onBreak(event: BlockBreakEvent) {
@@ -52,11 +54,10 @@ abstract class GatheringJob(
             return
         }
         plugin.server.pluginManager.callEvent(GatheringEvent(event.player, this, block))
-        // ドロップが出ない壊し方だった場合に備えて掃除する（ドロップは同じtick内に発生する）
-        plugin.runNextTick { pending.remove(block) }
     }
 
-    @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
+    // ドロップを書き換える処理の順番は CLAUDE.md の「BlockDropItemEvent の優先度」を参照
+    @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
     fun onDrop(event: BlockDropItemEvent) {
         val player = event.player
         if (pending.remove(event.block) != player.uniqueId) return

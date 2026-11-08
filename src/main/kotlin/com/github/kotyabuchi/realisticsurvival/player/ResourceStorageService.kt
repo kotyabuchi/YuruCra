@@ -20,9 +20,10 @@ class ResourceStorageService(private val plugin: RealisticSurvival) : Listener {
     fun onPickup(event: PlayerAttemptPickupItemEvent) {
         val player = event.player
         val storage = plugin.players.status(player).resourceStorage
+        if (!storage.autoStore || storage.stored.isEmpty()) return
         val item = event.item
         val stack = item.itemStack
-        if (!storage.autoStore || !storage.accepts(stack)) return
+        if (!storage.accepts(stack)) return
         stack.amount -= storage.store(stack)
         if (stack.amount <= 0) {
             event.isCancelled = true

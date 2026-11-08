@@ -1,12 +1,13 @@
 package com.github.kotyabuchi.realisticsurvival.block
 
 import com.github.kotyabuchi.realisticsurvival.RealisticSurvival
+import com.github.kotyabuchi.realisticsurvival.util.TickScopedMap
 import com.github.kotyabuchi.realisticsurvival.util.ToolType
-import com.github.kotyabuchi.realisticsurvival.util.runNextTick
 import org.bukkit.Material
 import org.bukkit.block.Block
 import org.bukkit.block.data.Ageable
 import org.bukkit.event.EventHandler
+import org.bukkit.event.EventPriority
 import org.bukkit.event.Listener
 import org.bukkit.event.block.BlockBreakEvent
 import org.bukkit.event.block.BlockDropItemEvent
@@ -18,7 +19,8 @@ import org.bukkit.event.block.BlockDropItemEvent
  */
 class SafeCropAndReplant(private val plugin: RealisticSurvival) : Listener {
 
-    private val harvested = HashSet<Block>()
+    // 収穫の印。ドロップは同じtick内に発生するので、tickが変われば捨ててよい
+    private val harvested = TickScopedMap<Block, Boolean>(plugin.server)
     private val seeds = mapOf(
         Material.WHEAT to Material.WHEAT_SEEDS,
         Material.CARROTS to Material.CARROT,
@@ -29,8 +31,7 @@ class SafeCropAndReplant(private val plugin: RealisticSurvival) : Listener {
 
     /** クワ以外での収穫（デメテルのトーテムなど）でも植え直すようにする */
     fun markHarvest(block: Block) {
-        harvested += block
-        plugin.runNextTick { harvested.remove(block) }
+        harvested[block] = true
     }
 
     @EventHandler(ignoreCancelled = true)
@@ -44,10 +45,11 @@ class SafeCropAndReplant(private val plugin: RealisticSurvival) : Listener {
         }
     }
 
-    @EventHandler(ignoreCancelled = true)
+    // 経験値・ドロップ増加（NORMAL）より先に種を1つ使う
+    @EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
     fun onDrop(event: BlockDropItemEvent) {
         val block = event.block
-        if (!harvested.remove(block)) return
+        if (harvested.remove(block) == null) return
         val seed = seeds[event.blockState.type]
         if (seed != null) {
             val seedItem = event.items.firstOrNull { it.itemStack.type == seed } ?: return

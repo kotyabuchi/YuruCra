@@ -78,6 +78,6 @@ class Farmer(plugin: RealisticSurvival) : GatheringJob(plugin, JobType.FARMER) {
         addExp(2, Material.MELON)
         addExp(10, Material.PUMPKIN)
 
-        registerSkill(SkillCommand.LLL, TotemOfDemeter(plugin, this))
+        registerSkill(SkillCommand.LLL, TotemOfDemeter(plugin))
     }
 }

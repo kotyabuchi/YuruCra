@@ -3,7 +3,6 @@ package com.github.kotyabuchi.realisticsurvival.skill.gathering
 import com.destroystokyo.paper.ParticleBuilder
 import com.github.kotyabuchi.realisticsurvival.RealisticSurvival
 import com.github.kotyabuchi.realisticsurvival.block.BreakSource
-import com.github.kotyabuchi.realisticsurvival.job.Job
 import com.github.kotyabuchi.realisticsurvival.skill.Skill
 import com.github.kotyabuchi.realisticsurvival.util.runTimer
 import net.kyori.adventure.text.Component
@@ -24,7 +23,7 @@ import kotlin.math.sin
  * その場にトーテムを置き、60秒間、半径4ブロック内の作物を育てる。
  * 育ちきった作物は自動で収穫し、植え直す。
  */
-class TotemOfDemeter(plugin: RealisticSurvival, private val owner: Job) : Skill(plugin) {
+class TotemOfDemeter(plugin: RealisticSurvival) : Skill(plugin) {
     override val id = "TOTEM_OF_DEMETER"
     override val displayName = "Totem of Demeter"
     override val needLevel = 20

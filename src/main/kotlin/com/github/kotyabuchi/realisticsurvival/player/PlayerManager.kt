@@ -29,8 +29,18 @@ class PlayerManager(private val plugin: RealisticSurvival) : Listener {
     // ログイン前スレッドで読み込んだデータの受け渡し場所
     private val preloaded = ConcurrentHashMap<UUID, PlayerStatus>()
 
-    fun status(player: Player): PlayerStatus =
-        statuses.getOrPut(player.uniqueId) { loadBlocking(player.uniqueId) }
+    /**
+     * 参加中のプレイヤーのデータ。通常は参加時に読み込み済み。
+     * 読み込み前に呼ばれた場合だけ、その場で（メインスレッドを止めて）読み込む。
+     * ログアウト後に呼ばれた場合は、データが残り続けないようキャッシュしない。
+     */
+    fun status(player: Player): PlayerStatus {
+        statuses[player.uniqueId]?.let { return it }
+        plugin.logger.warning("${player.name} のデータが未読み込みのため、その場で読み込みます")
+        val status = loadBlocking(player.uniqueId)
+        if (player.isOnline) statuses[player.uniqueId] = status
+        return status
+    }
 
     /** プラグインの再読み込み時など、既にオンラインのプレイヤーを読み込む */
     fun loadOnlinePlayers() {

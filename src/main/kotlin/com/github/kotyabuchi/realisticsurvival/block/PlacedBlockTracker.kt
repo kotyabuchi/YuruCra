@@ -12,7 +12,7 @@ import org.bukkit.event.block.BlockPlaceEvent
  * 置いたばかりのブロックを覚えておく。
  * 「置いてすぐ壊す」を繰り返してジョブ経験値を稼げないようにするため。
  */
-class PlacedBlockTracker(plugin: RealisticSurvival) : Listener {
+class PlacedBlockTracker(private val plugin: RealisticSurvival) : Listener {
 
     private val placedAt = HashMap<Block, Long>()
 
@@ -25,6 +25,8 @@ class PlacedBlockTracker(plugin: RealisticSurvival) : Listener {
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     fun onPlace(event: BlockPlaceEvent) {
+        // 経験値の対象でないブロックは記録しない（建築が多いと記録がたまるため）
+        if (!plugin.jobs.isGatheringTarget(event.block.type)) return
         placedAt[event.block] = System.currentTimeMillis() + PROTECT_MILLIS
     }
 
