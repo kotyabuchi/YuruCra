@@ -22,6 +22,14 @@ RealisticSurvival（Paper プラグイン）の 26.x 対応版。旧版 `../Rele
 ./gradlew runServer   # run/ にテストサーバーを立てて起動（初回は run/eula.txt の同意が必要）
 ```
 
+## リソースパック
+
+- `resourcepack/` が配布用のリソースパック（形式 97.1 = 26.3）。`./gradlew build` で `build/resourcepack/PumpkingPack.zip` になる
+- アイテムの見た目は custom_model_data の**文字列**で切り替える。プラグイン側は `util/ItemModels.kt` の `ItemModel`、パック側は `assets/minecraft/items` の `"when"`。**両方を必ず一致させる**
+- パックなしの人には元のアイテムの見た目（矢印・看板など）がそのまま見えるようにする（`fallback` にバニラのモデルを書く）
+- 独自のモデル・テクスチャは名前空間 `pumpking` に置く。アイテムのテクスチャは `textures/item/` 以下でないと読み込まれない。ファイル名は小文字のみ
+- 26.x の定義ファイルの書き方が不明なときは、`%APPDATA%\.minecraft\versions\26.3\26.3.jar` の `assets/minecraft/items` を見本にする
+
 ## 構成
 
 - `RealisticSurvival.kt` … プラグイン本体。各機能のインスタンスを持つ。**DIライブラリは使わない**（各クラスはコンストラクタで `plugin` を受け取る）
@@ -31,6 +39,7 @@ RealisticSurvival（Paper プラグイン）の 26.x 対応版。旧版 `../Rele
 - `skill/` … スキル。基本クラスは `Skill` → `ToggleSkill` → `TimedToggleSkill` / `PassiveSkill`
 - `block/BreakContext.kt` … スキルによる一括破壊。`Player#breakBlock` で1つずつ壊し、破壊中は `current(player)` で「どのスキルによる破壊か」を判定できる。まとめて壊した分のドロップは起点に集め、経験値は起点の破壊イベントの最後（HIGHEST）でオーブ1つにまとめる（スキルから呼ぶときは `originEvent` に起点の BlockBreakEvent を渡す）
 - `feature/` … 他と独立した小さな便利機能（エレベーター・ワールド保護・石生成機・スポナー強化・農地・チャット音・初期アイテム）
+- `tombstone/` … 墓石。中身は死亡直後に `tombstones` テーブルへ保存し、メモリには位置だけ持つ。旧版の `TombStones.json` は初回起動時に一度だけ取り込む
 - `menu/` … チェストGUI。`MenuPage` を `InventoryHolder` にして判別する。開閉は `MenuService` 経由（次のtickで行う）
 
 ## BlockDropItemEvent の優先度
@@ -59,6 +68,8 @@ RealisticSurvival（Paper プラグイン）の 26.x 対応版。旧版 `../Rele
 
 ## 未移植（旧版にあってまだ移していない機能）
 
-墓石、強化モンスター、ペット、ダメージ表示、独自耐久値（ItemExtension）、金床プレス、グローバル修繕、チェストソート、ディスペンサー強化（OmniDispenser）、独自ポーション効果、戦闘系ジョブ、サウンドサンプルメニュー
+強化モンスター、ダメージ表示、独自耐久値（ItemExtension）・クラフト拡張、グローバル修繕、アイテムUUID、追加レシピ、チェストソート、サウンドサンプルメニュー
 
-移さないと決めたもの: 羊毛刈り（AnimalShearing）、ブロック設置ディスペンサー（BlockPlacer）
+旧版でも無効だったもの（移すかは都度決める）: 戦闘系ジョブ、ペット、体力バー、自動植林、独自ポーション効果、ワールドメニュー
+
+移さないと決めたもの: 羊毛刈り（AnimalShearing）、ブロック設置ディスペンサー（BlockPlacer）、金床プレス（AnvilPressCraft）、カスタムモブ（CursedEye）、多機能ディスペンサー（OmniDispenser）
