@@ -22,6 +22,13 @@ enum class ItemModel(val id: String) {
 
     /** オークの看板（OAK_SIGN）に付ける */
     TOMBSTONE("pumpking:tombstone"),
+
+    /** 深層岩の丸石だけで作った石の道具（STONE_PICKAXE など）に付ける */
+    DEEPSLATE_PICKAXE("pumpking:deepslate_pickaxe"),
+    DEEPSLATE_AXE("pumpking:deepslate_axe"),
+    DEEPSLATE_SHOVEL("pumpking:deepslate_shovel"),
+    DEEPSLATE_HOE("pumpking:deepslate_hoe"),
+    DEEPSLATE_SWORD("pumpking:deepslate_sword"),
 }
 
 fun ItemStack.withModel(model: ItemModel): ItemStack = apply {

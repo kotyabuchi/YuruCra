@@ -16,6 +16,7 @@ import com.github.kotyabuchi.yurucra.feature.StarterItems
 import com.github.kotyabuchi.yurucra.feature.StoneGenerator
 import com.github.kotyabuchi.yurucra.feature.UtilityRecipes
 import com.github.kotyabuchi.yurucra.feature.WorldProtection
+import com.github.kotyabuchi.yurucra.item.ItemDurability
 import com.github.kotyabuchi.yurucra.item.ItemIdentity
 import com.github.kotyabuchi.yurucra.job.JobProgress
 import com.github.kotyabuchi.yurucra.job.JobRegistry
@@ -110,7 +111,7 @@ class YuruCra : JavaPlugin() {
             players, resourceStorage, breakContext, placedBlocks, safeCrop, menus, tombStones, resourcePacks,
             chestSort, damagePopup, utilityRecipes,
             fights, skeletons, spiders, witches, explosions, HelmetMobs(),
-            ItemIdentity(this),
+            ItemIdentity(this), ItemDurability(this),
             SkillCaster(this), MenuCompass(this),
             // 便利機能
             Elevator(), WorldProtection(), StoneGenerator(this), SpawnerUpgrade(),
