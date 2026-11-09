@@ -3,6 +3,7 @@ package com.github.kotyabuchi.yurucra.monster
 import com.github.kotyabuchi.yurucra.util.runTimer
 import org.bukkit.Location
 import org.bukkit.Material
+import org.bukkit.Sound
 import org.bukkit.entity.EntityType
 import org.bukkit.entity.FallingBlock
 import org.bukkit.entity.LivingEntity
@@ -20,6 +21,8 @@ import java.util.UUID
  *
  * - ときどき標的に向けてクモの巣を飛ばす。着地した巣は5秒で消える
  * - ときどき標的に向かって飛びかかる
+ *
+ * 音: 吐くとき＝スポンジが水を吸う音（高め）、巣が着地したとき＝クモの巣を置く音、飛びかかるとき＝ネザースプラウトを叩く音（高め）
  */
 class AdvancedSpider(private val plugin: Plugin) : FightBehavior, Listener {
 
@@ -46,7 +49,9 @@ class AdvancedSpider(private val plugin: Plugin) : FightBehavior, Listener {
     fun onLand(event: EntityChangeBlockEvent) {
         val falling = event.entity as? FallingBlock ?: return
         if (!flyingWebs.remove(falling.uniqueId)) return
-        placedWebs.addLast(PlacedWeb(event.block.location, plugin.server.currentTick + WEB_LIFETIME_TICKS))
+        val location = event.block.location
+        placedWebs.addLast(PlacedWeb(location, plugin.server.currentTick + WEB_LIFETIME_TICKS))
+        location.world.playSound(location.toCenterLocation(), Sound.BLOCK_COBWEB_PLACE, 1f, 1f)
     }
 
     /** 停止時に、残っている巣を消す */
@@ -67,6 +72,7 @@ class AdvancedSpider(private val plugin: Plugin) : FightBehavior, Listener {
             it.isPersistent = false
         }
         web.velocity = direction.multiply(0.2)
+        mob.world.playSound(mob.location, Sound.BLOCK_SPONGE_ABSORB, 1f, 1.5f)
         flyingWebs += web.uniqueId
         return true
     }
@@ -82,6 +88,7 @@ class AdvancedSpider(private val plugin: Plugin) : FightBehavior, Listener {
             velocity.y.coerceIn(-MAX_LEAP_SPEED, MAX_LEAP_SPEED),
             velocity.z.coerceIn(-MAX_LEAP_SPEED, MAX_LEAP_SPEED),
         )
+        mob.world.playSound(from, Sound.BLOCK_NETHER_SPROUTS_HIT, 1f, 1.5f)
         return true
     }
 
