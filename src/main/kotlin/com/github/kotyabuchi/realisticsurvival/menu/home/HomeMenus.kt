@@ -2,11 +2,14 @@ package com.github.kotyabuchi.realisticsurvival.menu.home
 
 import com.github.kotyabuchi.realisticsurvival.RealisticSurvival
 import com.github.kotyabuchi.realisticsurvival.menu.BlankButton
+import com.github.kotyabuchi.realisticsurvival.menu.ConfirmMenu
 import com.github.kotyabuchi.realisticsurvival.menu.Menu
 import com.github.kotyabuchi.realisticsurvival.menu.MenuButton
 import com.github.kotyabuchi.realisticsurvival.menu.TextPrompt
 import com.github.kotyabuchi.realisticsurvival.player.Home
+import com.github.kotyabuchi.realisticsurvival.util.ItemModel
 import com.github.kotyabuchi.realisticsurvival.util.buttonItem
+import com.github.kotyabuchi.realisticsurvival.util.withModel
 import com.github.kotyabuchi.realisticsurvival.util.consumeOne
 import com.github.kotyabuchi.realisticsurvival.util.loreLine
 import com.github.kotyabuchi.realisticsurvival.util.runNextTick
@@ -23,20 +26,22 @@ import org.bukkit.entity.Player
 import org.bukkit.event.inventory.InventoryClickEvent
 import org.bukkit.inventory.ItemStack
 
-/** 自分のホーム一覧。先頭にワールドスポーンとリスポーン地点が並ぶ */
+/** 自分のホーム一覧。先頭にワールドスポーン・リスポーン地点・直近の墓石が並ぶ */
 class HomeMenu(
     plugin: RealisticSurvival,
     private val player: Player,
     private val respawn: Location? = player.getRespawnLocation(false),
+    private val tombStone: Location? = plugin.tombStones.latest(player.uniqueId)?.location(),
 ) : Menu(
     plugin,
     text("${player.name}'s Homes"),
-    1 + (if (respawn != null) 1 else 0) + plugin.players.status(player).homes.size,
+    1 + (if (respawn != null) 1 else 0) + (if (tombStone != null) 1 else 0) + plugin.players.status(player).homes.size,
     Frame.TOP, Frame.SIDE,
 ) {
     override fun build() {
         put(HomeButton(player, Home.temporary("World Spawn", player.world.spawnLocation.apply { yaw = 0f }, Material.GRASS_BLOCK)))
         respawn?.let { put(HomeButton(player, Home.temporary("Respawn Point", it.clone().apply { yaw = 0f }, Material.RED_BED))) }
+        tombStone?.let { put(HomeButton(player, Home.temporary("Recent TombStone", it, Material.OAK_SIGN), ItemModel.TOMBSTONE)) }
 
         var page = 0
         plugin.players.status(player).homes.forEach { home ->
@@ -105,7 +110,8 @@ class ChangeHomeIconMenu(plugin: RealisticSurvival, private val home: Home) :
     }
 }
 
-private class HomeButton(viewer: Player, private val home: Home) : MenuButton(createIcon(viewer, home)) {
+private class HomeButton(viewer: Player, private val home: Home, model: ItemModel? = null) :
+    MenuButton(createIcon(viewer, home).also { icon -> model?.let { icon.withModel(it) } }) {
 
     override fun onLeftClick(player: Player, event: InventoryClickEvent, menu: Menu) {
         val destination = home.location()
@@ -165,7 +171,8 @@ private class HomeButton(viewer: Player, private val home: Home) : MenuButton(cr
     }
 }
 
-private class CreateHomeButton : MenuButton(buttonItem(Material.ENDER_EYE, text("Create Home", NamedTextColor.GREEN))) {
+private class CreateHomeButton :
+    MenuButton(buttonItem(Material.ENDER_EYE, text("Create Home", NamedTextColor.GREEN)).withModel(ItemModel.PLUS)) {
     override fun onLeftClick(player: Player, event: InventoryClickEvent, menu: Menu) {
         val plugin = menu.plugin
         plugin.menus.close(player) {
@@ -209,9 +216,12 @@ private class ChangePublicButton(private val home: Home) :
 
 private class RemoveButton(private val home: Home) : MenuButton(buttonItem(Material.BARRIER, text("Remove"))) {
     override fun onLeftClick(player: Player, event: InventoryClickEvent, menu: Menu) {
-        menu.plugin.homes.remove(player, home) {
-            val prev = menu.prevMenu
-            if (prev != null) menu.plugin.menus.reopen(player, prev) else menu.plugin.menus.close(player)
-        }
+        val plugin = menu.plugin
+        plugin.menus.open(player, ConfirmMenu(plugin, "Remove Home", listOf("[${home.name}]を削除します"), confirmLabel = "削除する") {
+            plugin.homes.remove(player, home) {
+                // 設定画面のひとつ前（ホーム一覧）に戻る
+                menu.prevMenu?.let { plugin.menus.reopen(player, it) }
+            }
+        })
     }
 }

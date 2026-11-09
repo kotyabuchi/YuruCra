@@ -21,6 +21,7 @@ import com.github.kotyabuchi.realisticsurvival.menu.MenuService
 import com.github.kotyabuchi.realisticsurvival.player.HomeService
 import com.github.kotyabuchi.realisticsurvival.player.PlayerManager
 import com.github.kotyabuchi.realisticsurvival.player.ResourceStorageService
+import com.github.kotyabuchi.realisticsurvival.tombstone.TombStoneService
 import com.github.kotyabuchi.realisticsurvival.util.runTimer
 import org.bukkit.event.Listener
 import org.bukkit.plugin.java.JavaPlugin
@@ -53,6 +54,8 @@ class RealisticSurvival : JavaPlugin() {
         private set
     lateinit var menus: MenuService
         private set
+    lateinit var tombStones: TombStoneService
+        private set
 
     override fun onEnable() {
         dataFolder.mkdirs()
@@ -68,9 +71,10 @@ class RealisticSurvival : JavaPlugin() {
         progress = JobProgress(this)
         jobs = JobRegistry(this)
         menus = MenuService(this)
+        tombStones = TombStoneService(this).also { it.load() }
 
         registerListeners(
-            players, resourceStorage, breakContext, placedBlocks, safeCrop, menus,
+            players, resourceStorage, breakContext, placedBlocks, safeCrop, menus, tombStones,
             SkillCaster(this), MenuCompass(this),
             // 便利機能
             Elevator(), WorldProtection(), StoneGenerator(this), SpawnerUpgrade(),

@@ -35,6 +35,9 @@ class Database(private val file: File, private val logger: Logger) {
                 stmt.executeUpdate("CREATE TABLE IF NOT EXISTS homes (home_id INTEGER PRIMARY KEY AUTOINCREMENT, uuid TEXT NOT NULL, home_name TEXT NOT NULL, world TEXT NOT NULL, x REAL NOT NULL, y REAL NOT NULL, z REAL NOT NULL, yaw REAL NOT NULL, icon TEXT, is_public INTEGER DEFAULT 0)")
                 stmt.executeUpdate("CREATE TABLE IF NOT EXISTS resource_storage_size (uuid TEXT NOT NULL PRIMARY KEY, slot_size INTEGER NOT NULL DEFAULT 2)")
                 stmt.executeUpdate("CREATE TABLE IF NOT EXISTS resource_storage (uuid TEXT NOT NULL, material TEXT NOT NULL, amount INTEGER NOT NULL)")
+                // 新版で追加（旧版は TombStones.json に保存していた）。items はインベントリ41スロット分をまとめたバイト列
+                stmt.executeUpdate("CREATE TABLE IF NOT EXISTS tombstones (tombstone_id INTEGER PRIMARY KEY AUTOINCREMENT, owner TEXT NOT NULL, entity_uuid TEXT NOT NULL UNIQUE, world TEXT NOT NULL, x REAL NOT NULL, y REAL NOT NULL, z REAL NOT NULL, created_at INTEGER NOT NULL, items BLOB NOT NULL)")
+                stmt.executeUpdate("CREATE INDEX IF NOT EXISTS tombstones_owner ON tombstones(owner)")
             }
             conn.prepareStatement("INSERT OR IGNORE INTO jobs(job_name) VALUES (?)").use { pstmt ->
                 jobNames.forEach {

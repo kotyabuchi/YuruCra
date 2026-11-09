@@ -19,6 +19,7 @@ import org.bukkit.entity.Player
  * /rs menu                                              メインメニューを開く
  * /rs save                                              全員のデータを保存する（OP）
  * /rs job <set|add|remove> <exp|level> <job> <量> [対象]  ジョブの経験値・レベルを変える（OP）
+ * /rs tombstone ...                                     墓石の管理（OP。TombStoneCommand を参照）
  */
 object RsCommand {
 
@@ -77,6 +78,7 @@ object RsCommand {
                     }
             )
             .then(job)
+            .then(TombStoneCommand.build(plugin))
             .build()
     }
 

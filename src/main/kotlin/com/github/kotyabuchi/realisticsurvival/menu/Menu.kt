@@ -1,8 +1,10 @@
 package com.github.kotyabuchi.realisticsurvival.menu
 
 import com.github.kotyabuchi.realisticsurvival.RealisticSurvival
+import com.github.kotyabuchi.realisticsurvival.util.ItemModel
 import com.github.kotyabuchi.realisticsurvival.util.buttonItem
 import com.github.kotyabuchi.realisticsurvival.util.text
+import com.github.kotyabuchi.realisticsurvival.util.withModel
 import net.kyori.adventure.text.Component
 import org.bukkit.Bukkit
 import org.bukkit.Material
@@ -160,15 +162,17 @@ class BlankButton(material: Material = Material.BLACK_STAINED_GLASS_PANE) :
     MenuButton(buttonItem(material, Component.empty()), clickSound = null)
 
 class BackToPrevButton(private val prev: Menu) :
-    MenuButton(buttonItem(Material.ARROW, text("Back to ").append(prev.title))) {
+    MenuButton(buttonItem(Material.ARROW, text("Back to ").append(prev.title)).withModel(ItemModel.RETURN)) {
     override fun onLeftClick(player: Player, event: InventoryClickEvent, menu: Menu) {
         prev.refresh()
         menu.plugin.menus.open(player, prev, asBack = true)
     }
 }
 
-class PageButton(private val targetPage: Int, totalPages: Int, isNext: Boolean) :
-    MenuButton(buttonItem(Material.ARROW, text((if (isNext) "Next" else "Back") + " page ${targetPage + 1} / $totalPages"))) {
+class PageButton(private val targetPage: Int, totalPages: Int, isNext: Boolean) : MenuButton(
+    buttonItem(Material.ARROW, text((if (isNext) "Next" else "Back") + " page ${targetPage + 1} / $totalPages"))
+        .withModel(if (isNext) ItemModel.ARROW_RIGHT else ItemModel.ARROW_LEFT)
+) {
     override fun onLeftClick(player: Player, event: InventoryClickEvent, menu: Menu) {
         menu.plugin.menus.open(player, menu, targetPage, asBack = true)
     }

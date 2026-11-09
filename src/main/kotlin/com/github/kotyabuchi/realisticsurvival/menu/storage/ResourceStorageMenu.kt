@@ -5,7 +5,9 @@ import com.github.kotyabuchi.realisticsurvival.menu.BlankButton
 import com.github.kotyabuchi.realisticsurvival.menu.Menu
 import com.github.kotyabuchi.realisticsurvival.menu.MenuButton
 import com.github.kotyabuchi.realisticsurvival.player.ResourceStorage
+import com.github.kotyabuchi.realisticsurvival.util.ItemModel
 import com.github.kotyabuchi.realisticsurvival.util.buttonItem
+import com.github.kotyabuchi.realisticsurvival.util.withModel
 import com.github.kotyabuchi.realisticsurvival.util.giveOrDrop
 import com.github.kotyabuchi.realisticsurvival.util.loreLine
 import com.github.kotyabuchi.realisticsurvival.util.sendError
@@ -85,6 +87,7 @@ class ResourceStorageMenu(plugin: RealisticSurvival, private val player: Player)
 
     private class UnlockSlotButton(storage: ResourceStorage) : MenuButton(
         buttonItem(Material.ENDER_EYE, text("Unlock Slot", NamedTextColor.GREEN), listOf(loreLine("Cost: ", "${cost(storage)} Lv")))
+            .withModel(ItemModel.PLUS)
     ) {
         override fun onLeftClick(player: Player, event: InventoryClickEvent, menu: Menu) {
             val storage = menu.plugin.players.status(player).resourceStorage
