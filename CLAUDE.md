@@ -44,7 +44,7 @@ GitHub: https://github.com/kotyabuchi/YuruCra （旧YuruCra は `legacy` ブラ�
 - `block/BreakContext.kt` … スキルによる一括破壊。`Player#breakBlock` で1つずつ壊し、破壊中は `current(player)` で「どのスキルによる破壊か」を判定できる。まとめて壊した分のドロップは起点に集め、経験値は起点の破壊イベントの最後（HIGHEST）でオーブ1つにまとめる（スキルから呼ぶときは `originEvent` に起点の BlockBreakEvent を渡す）
 - `feature/` … 他と独立した小さな便利機能（エレベーター・ワールド保護・石生成機・スポナー強化・農地・チャット音・初期アイテム・リソースパック配布・チェストソート・追加レシピ・ダメージ表示）
 - `monster/` … 強化モンスター。戦闘中の行動は `FightBehavior` を `FightTracker` に登録すると、1つのタイマーで標的のいるモブだけ確認される。ほかに帽子をかぶったゾンビ・スケルトン、モンスターの爆発で壊れた地形を元に戻す処理（TNTなどプレイヤーの爆発はバニラどおり）
-- `item/` … アイテムの仕組み。`ItemIdentity` は1つずつしか持てないアイテムに、見分け用のUUIDを一度だけ付ける（`ItemIdentity.uuidOf` で読む）。`ItemDurability` は耐久値（耐久力エンチャントは最大耐久値を増やす・深層岩の石の道具は1.5倍）。最大耐久値はアイテムの `max_damage` を直接変えるので、減り方・修理・修繕はバニラのまま
+- `item/` … アイテムの仕組み。`ItemIdentity` は1つずつしか持てないアイテムに、見分け用のUUIDを一度だけ付ける（`ItemIdentity.uuidOf` で読む）。`ItemDurability` は耐久値（耐久力エンチャントは最大耐久値を増やす・深層岩の石の道具は1.5倍）。最大耐久値はアイテムの `max_damage` を直接変えるので、減り方・修理・修繕はバニラのまま。`GlobalMending` は修繕付きの道具をインベントリのどこにあっても経験値で直す
 - `tombstone/` … 墓石。中身は死亡直後に `tombstones` テーブルへ保存し、メモリには位置だけ持つ
 - `command/` … `/yc`（別名 `/yurucra`）。Brigadier で登録する
 - `menu/` … チェストGUI。`MenuPage` を `InventoryHolder` にして判別する。開閉は `MenuService` 経由（次のtickで行う）
@@ -76,7 +76,7 @@ GitHub: https://github.com/kotyabuchi/YuruCra （旧YuruCra は `legacy` ブラ�
 
 ## 未移植（旧RealisticSurvival にあってまだ移していない機能）
 
-グローバル修繕、サウンドサンプルメニュー
+サウンドサンプルメニュー
 
 旧RealisticSurvival でも無効だったもの（移すかは都度決める）: 戦闘系ジョブ、ペット、体力バー、自動植林、独自ポーション効果、ワールドメニュー
 

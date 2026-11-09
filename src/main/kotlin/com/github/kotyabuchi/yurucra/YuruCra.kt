@@ -16,6 +16,7 @@ import com.github.kotyabuchi.yurucra.feature.StarterItems
 import com.github.kotyabuchi.yurucra.feature.StoneGenerator
 import com.github.kotyabuchi.yurucra.feature.UtilityRecipes
 import com.github.kotyabuchi.yurucra.feature.WorldProtection
+import com.github.kotyabuchi.yurucra.item.GlobalMending
 import com.github.kotyabuchi.yurucra.item.ItemDurability
 import com.github.kotyabuchi.yurucra.item.ItemIdentity
 import com.github.kotyabuchi.yurucra.job.JobProgress
@@ -107,11 +108,13 @@ class YuruCra : JavaPlugin() {
         val witches = AdvancedWitch(this, fights)
         listOf(skeletons, spiders, witches).forEach { fights.register(it) }
 
+        val itemDurability = ItemDurability(this)
+
         registerListeners(
             players, resourceStorage, breakContext, placedBlocks, safeCrop, menus, tombStones, resourcePacks,
             chestSort, damagePopup, utilityRecipes,
             fights, skeletons, spiders, witches, explosions, HelmetMobs(),
-            ItemIdentity(this), ItemDurability(this),
+            ItemIdentity(this), itemDurability, GlobalMending(itemDurability),
             SkillCaster(this), MenuCompass(this),
             // 便利機能
             Elevator(), WorldProtection(), StoneGenerator(this), SpawnerUpgrade(),

@@ -111,7 +111,8 @@ class ItemDurability(private val plugin: Plugin) : Listener {
         }
     }
 
-    private fun synced(item: ItemStack): ItemStack {
+    /** 最大耐久値と説明文を合わせ直す（耐久値のない物はそのまま）。耐久値を直接書き換えたあとに呼ぶ */
+    fun synced(item: ItemStack): ItemStack {
         if (isTarget(item)) sync(item)
         return item
     }
