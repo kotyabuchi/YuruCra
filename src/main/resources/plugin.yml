@@ -1,9 +1,10 @@
-name: RealisticSurvival
+name: YuruCra
 version: '${version}'
-main: com.github.kotyabuchi.realisticsurvival.RealisticSurvival
+main: com.github.kotyabuchi.yurucra.YuruCra
 api-version: '${apiVersion}'
-description: ジョブ・スキル・ホーム・リソースストレージを追加するサバイバル拡張
+description: ジョブ・スキル・ホーム・墓石・リソースストレージなどを追加するサバイバル拡張
 author: kotyabuchi
+website: https://github.com/kotyabuchi/YuruCra
 libraries:
   - org.jetbrains.kotlin:kotlin-stdlib:${kotlinVersion}
   - org.xerial:sqlite-jdbc:${sqliteVersion}

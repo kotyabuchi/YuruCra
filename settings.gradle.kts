@@ -1,1 +1,1 @@
-rootProject.name = "RealisticSurvival"
+rootProject.name = "YuruCra"

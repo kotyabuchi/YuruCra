@@ -1,0 +1,12 @@
+# YuruCra の設定
+
+resource-pack:
+  # プレイヤーに配るリソースパックのURL。空にすると配布しない
+  # GitHub Releases の「最新版」の固定リンクなので、リリースを更新すれば自動で新しいパックになる
+  url: "https://github.com/kotyabuchi/YuruCra/releases/latest/download/PumpkingPack.zip"
+  # パックのSHA-1。空なら起動時（と /yc resourcepack reload 時）に上のURLからダウンロードして計算する
+  sha1: ""
+  # true にすると、パックを断ったプレイヤーは参加できない
+  required: false
+  # パックを受け取るか聞く画面に出す説明
+  prompt: "YuruCra 専用のアイコンや墓石の見た目を表示するリソースパックです"

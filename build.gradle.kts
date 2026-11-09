@@ -1,4 +1,5 @@
 import org.jetbrains.kotlin.gradle.plugin.getKotlinPluginVersion
+import java.security.MessageDigest
 
 plugins {
     kotlin("jvm") version "2.4.21"
@@ -45,6 +46,13 @@ val resourcePackZip = tasks.register<Zip>("resourcePackZip") {
     from("resourcepack")
     archiveFileName.set("PumpkingPack.zip")
     destinationDirectory.set(layout.buildDirectory.dir("resourcepack"))
+    // GitHub Releases に上げるときの確認用に SHA-1 も出しておく
+    doLast {
+        val zip = archiveFile.get().asFile
+        val sha1 = MessageDigest.getInstance("SHA-1").digest(zip.readBytes()).joinToString("") { "%02x".format(it) }
+        File(zip.parentFile, "${zip.name}.sha1").writeText(sha1)
+        logger.lifecycle("PumpkingPack.zip sha1=$sha1")
+    }
 }
 
 tasks.build {
