@@ -42,7 +42,7 @@ GitHub: https://github.com/kotyabuchi/YuruCra （旧YuruCra は `legacy` ブラ�
 - `job/` … ジョブ、経験値付与（`JobProgress`）、スキル詠唱（`SkillCaster`）
 - `skill/` … スキル。基本クラスは `Skill` → `ToggleSkill` → `TimedToggleSkill` / `PassiveSkill`
 - `block/BreakContext.kt` … スキルによる一括破壊。`Player#breakBlock` で1つずつ壊し、破壊中は `current(player)` で「どのスキルによる破壊か」を判定できる。まとめて壊した分のドロップは起点に集め、経験値は起点の破壊イベントの最後（HIGHEST）でオーブ1つにまとめる（スキルから呼ぶときは `originEvent` に起点の BlockBreakEvent を渡す）
-- `feature/` … 他と独立した小さな便利機能（エレベーター・ワールド保護・石生成機・スポナー強化・農地・チャット音・初期アイテム・リソースパック配布）
+- `feature/` … 他と独立した小さな便利機能（エレベーター・ワールド保護・石生成機・スポナー強化・農地・チャット音・初期アイテム・リソースパック配布・チェストソート・追加レシピ・ダメージ表示）
 - `tombstone/` … 墓石。中身は死亡直後に `tombstones` テーブルへ保存し、メモリには位置だけ持つ
 - `command/` … `/yc`（別名 `/yurucra`）。Brigadier で登録する
 - `menu/` … チェストGUI。`MenuPage` を `InventoryHolder` にして判別する。開閉は `MenuService` 経由（次のtickで行う）
@@ -66,6 +66,7 @@ GitHub: https://github.com/kotyabuchi/YuruCra （旧YuruCra は `legacy` ブラ�
   - ブロックの探索は上限付きの幅優先にする（再帰の深さ優先にしない）
 
 - 使わない古いAPI: `ChatColor`・`§`/`&` の色コード（→ Adventure の `Component`）、`setCustomModelData(Int)`（→ データコンポーネント）、`Material.values()`（→ `Material.entries`）、`Block#isValidTool`（→ `canHarvestWith`）、`ParticleBuilder#extra`（→ `speed`）、AnvilGUI（→ Dialog API の `TextPrompt`）、`plugin.yml` の `commands:`（→ Brigadier の `YcCommand`）
+- サバイバルのクライアントはスロットの中クリックをサーバーへ送らない（`ClickType.MIDDLE` はクリエイティブでしか来ない）。操作の割り当てに使わない
 - 道具の判定は `Tag.ITEMS_PICKAXES` などのタグを使う（`ToolType`）。素材名の文字列判定は新ブロック追加で漏れるので避ける
 - `JobType` の名前・スキルの `id`・DBのテーブル構成は保存データと紐付いている。変えると既存のデータが読めなくなる
 - 依存ライブラリは jar に同梱せず `plugin.yml` の `libraries` で読み込む（`compileOnly` にする）
@@ -73,7 +74,7 @@ GitHub: https://github.com/kotyabuchi/YuruCra （旧YuruCra は `legacy` ブラ�
 
 ## 未移植（旧RealisticSurvival にあってまだ移していない機能）
 
-強化モンスター、ダメージ表示、独自耐久値（ItemExtension）・クラフト拡張、グローバル修繕、アイテムUUID、追加レシピ、チェストソート、サウンドサンプルメニュー
+強化モンスター、独自耐久値（ItemExtension）・クラフト拡張、グローバル修繕、アイテムUUID、サウンドサンプルメニュー
 
 旧RealisticSurvival でも無効だったもの（移すかは都度決める）: 戦闘系ジョブ、ペット、体力バー、自動植林、独自ポーション効果、ワールドメニュー
 

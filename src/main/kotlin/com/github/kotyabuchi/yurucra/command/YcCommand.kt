@@ -17,6 +17,7 @@ import org.bukkit.entity.Player
 
 /**
  * /yc menu                                              メインメニューを開く
+ * /yc sort                                              次に右クリックしたコンテナをソートする
  * /yc save                                              全員のデータを保存する（OP）
  * /yc job <set|add|remove> <exp|level> <job> <量> [対象]  ジョブの経験値・レベルを変える（OP）
  * /yc tombstone ...                                     墓石の管理（OP。TombStoneCommand を参照）
@@ -63,6 +64,14 @@ object YcCommand {
                     .executes { ctx ->
                         val player = ctx.source.executor as Player
                         plugin.menus.open(player, MainMenu(plugin))
+                        Command.SINGLE_SUCCESS
+                    }
+            )
+            .then(
+                Commands.literal("sort")
+                    .requires { it.executor is Player }
+                    .executes { ctx ->
+                        plugin.chestSort.startSortMode(ctx.source.executor as Player)
                         Command.SINGLE_SUCCESS
                     }
             )

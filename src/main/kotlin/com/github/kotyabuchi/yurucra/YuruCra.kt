@@ -6,12 +6,15 @@ import com.github.kotyabuchi.yurucra.block.SafeCropAndReplant
 import com.github.kotyabuchi.yurucra.command.YcCommand
 import com.github.kotyabuchi.yurucra.data.Database
 import com.github.kotyabuchi.yurucra.feature.ChatSound
+import com.github.kotyabuchi.yurucra.feature.ChestSort
+import com.github.kotyabuchi.yurucra.feature.DamagePopup
 import com.github.kotyabuchi.yurucra.feature.Elevator
 import com.github.kotyabuchi.yurucra.feature.FarmlandCare
 import com.github.kotyabuchi.yurucra.feature.ResourcePackService
 import com.github.kotyabuchi.yurucra.feature.SpawnerUpgrade
 import com.github.kotyabuchi.yurucra.feature.StarterItems
 import com.github.kotyabuchi.yurucra.feature.StoneGenerator
+import com.github.kotyabuchi.yurucra.feature.UtilityRecipes
 import com.github.kotyabuchi.yurucra.feature.WorldProtection
 import com.github.kotyabuchi.yurucra.job.JobProgress
 import com.github.kotyabuchi.yurucra.job.JobRegistry
@@ -59,6 +62,10 @@ class YuruCra : JavaPlugin() {
         private set
     lateinit var resourcePacks: ResourcePackService
         private set
+    lateinit var chestSort: ChestSort
+        private set
+    lateinit var damagePopup: DamagePopup
+        private set
 
     override fun onEnable() {
         dataFolder.mkdirs()
@@ -77,9 +84,13 @@ class YuruCra : JavaPlugin() {
         menus = MenuService(this)
         tombStones = TombStoneService(this).also { it.load() }
         resourcePacks = ResourcePackService(this)
+        chestSort = ChestSort()
+        damagePopup = DamagePopup(this)
+        val utilityRecipes = UtilityRecipes(this).also { it.register() }
 
         registerListeners(
             players, resourceStorage, breakContext, placedBlocks, safeCrop, menus, tombStones, resourcePacks,
+            chestSort, damagePopup, utilityRecipes,
             SkillCaster(this), MenuCompass(this),
             // 便利機能
             Elevator(), WorldProtection(), StoneGenerator(this), SpawnerUpgrade(),
@@ -100,6 +111,7 @@ class YuruCra : JavaPlugin() {
     }
 
     override fun onDisable() {
+        if (::damagePopup.isInitialized) damagePopup.clear()
         if (!::database.isInitialized) return
         if (::progress.isInitialized) progress.clearAll()
         if (::players.isInitialized) {
