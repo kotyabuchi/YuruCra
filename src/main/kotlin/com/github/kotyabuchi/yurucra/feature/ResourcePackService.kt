@@ -30,7 +30,7 @@ class ResourcePackService(private val plugin: YuruCra) : Listener {
 
     private val http = HttpClient.newBuilder()
         .followRedirects(HttpClient.Redirect.NORMAL)
-        .connectTimeout(Duration.ofSeconds(10))
+        .connectTimeout(Duration.ofSeconds(30))
         .build()
 
     // 準備できたパックの情報（URLが空なら null のまま）
