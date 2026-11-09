@@ -1,0 +1,13 @@
+{
+  "model": {
+    "type": "minecraft:select",
+    "property": "minecraft:custom_model_data",
+    "index": 0,
+    "cases": [
+      { "when": "pumpking:arrow_left", "model": { "type": "minecraft:model", "model": "pumpking:item/gui/arrow_left" } },
+      { "when": "pumpking:arrow_right", "model": { "type": "minecraft:model", "model": "pumpking:item/gui/arrow_right" } },
+      { "when": "pumpking:return", "model": { "type": "minecraft:model", "model": "pumpking:item/gui/return" } }
+    ],
+    "fallback": { "type": "minecraft:model", "model": "minecraft:item/arrow" }
+  }
+}

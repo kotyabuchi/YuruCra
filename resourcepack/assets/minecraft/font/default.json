@@ -1,0 +1,13 @@
+{
+	"providers": [
+        {
+            "type": "bitmap",
+            "file": "minecraft:font/star.png",
+            "ascent": -14,
+            "height": 10,
+            "chars": [
+                "\uEff6"
+            ]
+        }
+	]
+}

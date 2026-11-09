@@ -38,6 +38,19 @@ tasks.test {
     useJUnitPlatform()
 }
 
+// resourcepack/ を build/resourcepack/PumpkingPack.zip にまとめる（プレイヤーに配るリソースパック）
+val resourcePackZip = tasks.register<Zip>("resourcePackZip") {
+    group = "build"
+    description = "リソースパックをzipにまとめる"
+    from("resourcepack")
+    archiveFileName.set("PumpkingPack.zip")
+    destinationDirectory.set(layout.buildDirectory.dir("resourcepack"))
+}
+
+tasks.build {
+    dependsOn(resourcePackZip)
+}
+
 kotlin {
     jvmToolchain(25)
 }
