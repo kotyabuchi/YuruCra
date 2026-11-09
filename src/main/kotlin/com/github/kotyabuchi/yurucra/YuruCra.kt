@@ -22,6 +22,12 @@ import com.github.kotyabuchi.yurucra.job.JobType
 import com.github.kotyabuchi.yurucra.job.SkillCaster
 import com.github.kotyabuchi.yurucra.menu.MenuCompass
 import com.github.kotyabuchi.yurucra.menu.MenuService
+import com.github.kotyabuchi.yurucra.monster.AdvancedSkeleton
+import com.github.kotyabuchi.yurucra.monster.AdvancedSpider
+import com.github.kotyabuchi.yurucra.monster.AdvancedWitch
+import com.github.kotyabuchi.yurucra.monster.FightTracker
+import com.github.kotyabuchi.yurucra.monster.HelmetMobs
+import com.github.kotyabuchi.yurucra.monster.MonsterExplosion
 import com.github.kotyabuchi.yurucra.player.HomeService
 import com.github.kotyabuchi.yurucra.player.PlayerManager
 import com.github.kotyabuchi.yurucra.player.ResourceStorageService
@@ -66,6 +72,10 @@ class YuruCra : JavaPlugin() {
         private set
     lateinit var damagePopup: DamagePopup
         private set
+    private lateinit var fights: FightTracker
+    private lateinit var skeletons: AdvancedSkeleton
+    private lateinit var spiders: AdvancedSpider
+    private lateinit var explosions: MonsterExplosion
 
     override fun onEnable() {
         dataFolder.mkdirs()
@@ -87,10 +97,18 @@ class YuruCra : JavaPlugin() {
         chestSort = ChestSort()
         damagePopup = DamagePopup(this)
         val utilityRecipes = UtilityRecipes(this).also { it.register() }
+        // 強化モンスター
+        fights = FightTracker(this)
+        skeletons = AdvancedSkeleton(this)
+        spiders = AdvancedSpider(this)
+        explosions = MonsterExplosion(this)
+        val witches = AdvancedWitch(this, fights)
+        listOf(skeletons, spiders, witches).forEach { fights.register(it) }
 
         registerListeners(
             players, resourceStorage, breakContext, placedBlocks, safeCrop, menus, tombStones, resourcePacks,
             chestSort, damagePopup, utilityRecipes,
+            fights, skeletons, spiders, witches, explosions, HelmetMobs(),
             SkillCaster(this), MenuCompass(this),
             // 便利機能
             Elevator(), WorldProtection(), StoneGenerator(this), SpawnerUpgrade(),
@@ -112,6 +130,11 @@ class YuruCra : JavaPlugin() {
 
     override fun onDisable() {
         if (::damagePopup.isInitialized) damagePopup.clear()
+        // ワールドに一時的な物（骨・クモの巣・飛んでいるブロック）を残さない
+        if (::fights.isInitialized) fights.clear()
+        if (::skeletons.isInitialized) skeletons.clear()
+        if (::spiders.isInitialized) spiders.clear()
+        if (::explosions.isInitialized) explosions.restoreAll()
         if (!::database.isInitialized) return
         if (::progress.isInitialized) progress.clearAll()
         if (::players.isInitialized) {
