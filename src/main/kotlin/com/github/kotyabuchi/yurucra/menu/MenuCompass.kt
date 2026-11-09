@@ -40,7 +40,7 @@ class MenuCompass(private val plugin: YuruCra) : Listener {
     private fun isCompass(item: ItemStack?): Boolean =
         item != null && item.type == Material.COMPASS && item.persistentDataContainer.has(key, PersistentDataType.BYTE)
 
-    private fun openMainMenu(player: Player) = plugin.menus.open(player, MainMenu(plugin))
+    private fun openMainMenu(player: Player) = plugin.menus.open(player, MainMenu(plugin, player))
 
     @EventHandler
     fun onJoin(event: PlayerJoinEvent) {

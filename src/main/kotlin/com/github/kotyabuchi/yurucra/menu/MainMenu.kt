@@ -12,13 +12,15 @@ import org.bukkit.Material
 import org.bukkit.entity.Player
 import org.bukkit.event.inventory.InventoryClickEvent
 
-class MainMenu(plugin: YuruCra) :
+/** @param viewer 開く人。OPならサウンドサンプルのボタンも出す */
+class MainMenu(plugin: YuruCra, private val viewer: Player) :
     Menu(plugin, text("Menu"), 3, Frame.TOP, Frame.SIDE) {
 
     override fun build() {
         put(JobMenuButton())
         put(HomeMenuButton())
         put(ResourceStorageButton())
+        if (viewer.isOp) put(SoundSampleButton())
     }
 
     private class JobMenuButton : MenuButton(buttonItem(Material.DIAMOND_PICKAXE, text("JobInfo"))) {
@@ -40,6 +42,12 @@ class MainMenu(plugin: YuruCra) :
 
         override fun onRightClick(player: Player, event: InventoryClickEvent, menu: Menu) {
             menu.plugin.menus.open(player, PublicHomeMenu(menu.plugin, player))
+        }
+    }
+
+    private class SoundSampleButton : MenuButton(buttonItem(Material.NOTE_BLOCK, text("Sound Sample"))) {
+        override fun onLeftClick(player: Player, event: InventoryClickEvent, menu: Menu) {
+            menu.plugin.menus.open(player, SoundSampleMenu(menu.plugin))
         }
     }
 

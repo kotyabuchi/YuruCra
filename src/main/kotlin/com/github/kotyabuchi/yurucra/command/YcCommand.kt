@@ -63,7 +63,7 @@ object YcCommand {
                     .requires { it.executor is Player }
                     .executes { ctx ->
                         val player = ctx.source.executor as Player
-                        plugin.menus.open(player, MainMenu(plugin))
+                        plugin.menus.open(player, MainMenu(plugin, player))
                         Command.SINGLE_SUCCESS
                     }
             )

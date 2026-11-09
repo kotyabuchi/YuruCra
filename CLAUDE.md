@@ -47,7 +47,7 @@ GitHub: https://github.com/kotyabuchi/YuruCra （旧YuruCra は `legacy` ブラ�
 - `item/` … アイテムの仕組み。`ItemIdentity` は1つずつしか持てないアイテムに、見分け用のUUIDを一度だけ付ける（`ItemIdentity.uuidOf` で読む）。`ItemDurability` は耐久値（耐久力エンチャントは最大耐久値を増やす・深層岩の石の道具は1.5倍）。最大耐久値はアイテムの `max_damage` を直接変えるので、減り方・修理・修繕はバニラのまま。`GlobalMending` は修繕付きの道具をインベントリのどこにあっても経験値で直す
 - `tombstone/` … 墓石。中身は死亡直後に `tombstones` テーブルへ保存し、メモリには位置だけ持つ
 - `command/` … `/yc`（別名 `/yurucra`）。Brigadier で登録する
-- `menu/` … チェストGUI。`MenuPage` を `InventoryHolder` にして判別する。開閉は `MenuService` 経由（次のtickで行う）
+- `menu/` … チェストGUI。`MenuPage` を `InventoryHolder` にして判別する。開閉は `MenuService` 経由（次のtickで行う）。メインメニューの「Sound Sample」は OP だけに出る、効果音を選ぶための試聴メニュー
 
 ## BlockDropItemEvent の優先度
 
@@ -76,7 +76,7 @@ GitHub: https://github.com/kotyabuchi/YuruCra （旧YuruCra は `legacy` ブラ�
 
 ## 未移植（旧RealisticSurvival にあってまだ移していない機能）
 
-サウンドサンプルメニュー
+なし（予定していたものはすべて移した）
 
 旧RealisticSurvival でも無効だったもの（移すかは都度決める）: 戦闘系ジョブ、ペット、体力バー、自動植林、独自ポーション効果、ワールドメニュー
 
