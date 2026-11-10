@@ -15,6 +15,9 @@ class JobRegistry(private val plugin: YuruCra) {
         put(JobType.EXCAVATOR, Excavator(plugin))
         put(JobType.LUMBERJACK, Lumberjack(plugin))
         put(JobType.FARMER, Farmer(plugin))
+        put(JobType.SWORD_MASTER, SwordMaster(plugin))
+        put(JobType.BATTLE_AXE, BattleAxe(plugin))
+        put(JobType.TAMER, Tamer(plugin))
     }
 
     init {

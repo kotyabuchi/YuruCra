@@ -13,13 +13,15 @@ enum class JobCategory { GATHERING, COMBAT }
 
 /**
  * ジョブの種類。名前はDBの jobs.job_name と一致させる（変えると保存データと紐付かなくなる）。
- * 戦闘系（SWORD_MASTER など）は旧RealisticSurvivalでも無効だったので未移植。
  */
 enum class JobType(val icon: Material, val category: JobCategory) {
     MINER(Material.STONE_PICKAXE, JobCategory.GATHERING),
     EXCAVATOR(Material.STONE_SHOVEL, JobCategory.GATHERING),
     LUMBERJACK(Material.STONE_AXE, JobCategory.GATHERING),
     FARMER(Material.STONE_HOE, JobCategory.GATHERING),
+    SWORD_MASTER(Material.IRON_SWORD, JobCategory.COMBAT),
+    BATTLE_AXE(Material.IRON_AXE, JobCategory.COMBAT),
+    TAMER(Material.BONE, JobCategory.COMBAT),
     ;
 
     val displayName: String = name.upperCamelCase()
