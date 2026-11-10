@@ -7,6 +7,13 @@ import com.github.kotyabuchi.yurucra.job.Job
 import com.github.kotyabuchi.yurucra.skill.PassiveSkill
 import com.github.kotyabuchi.yurucra.skill.ToolLinkedEffectSkill
 import com.github.kotyabuchi.yurucra.util.WeightedTable
+import com.github.kotyabuchi.yurucra.util.WoodType
+import com.github.kotyabuchi.yurucra.util.runNextTick
+import com.github.kotyabuchi.yurucra.util.woodType
+import org.bukkit.Tag
+import org.bukkit.block.Block
+import org.bukkit.block.BlockFace
+import org.bukkit.block.data.BlockData
 import org.bukkit.Material
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
@@ -90,5 +97,55 @@ class HadesBlessing(plugin: YuruCra, owner: Job) : ToolLinkedEffectSkill(plugin,
     override fun applyEffect(player: Player) {
         val amplifier = (owner.level(player) - 20) / 20 + 1
         player.addPotionEffect(PotionEffect(PotionEffectType.HASTE, 30, amplifier, true, false, false))
+    }
+}
+
+/**
+ * 土の上の原木を壊すと、その木の苗木を植え直す（苗木は手持ちから使わない）。
+ * 大きな木の根元4本を壊せば、4つ植わって元の大きさの木に育つ。
+ * ツツジの木（幹はオークの原木で、下の土が根付いた土になる）は、苗木の代わりにツツジを植える。
+ * 原木がなくなるのを待ってから植えるので、壊した次のtickにまとめて植える。
+ */
+class AutoReplantSapling(plugin: YuruCra, private val job: GatheringJob) : PassiveSkill(plugin, job) {
+    override val id = "AUTO_REPLANT_SAPLING"
+    override val displayName = "Auto Replant Sapling"
+    override val needLevel = 0
+    override val description = "土の上の原木を破壊した際に自動で苗木を植える"
+
+    private val pending = mutableListOf<Pair<Block, BlockData>>()
+
+    @EventHandler
+    fun onGather(event: GatheringEvent) {
+        if (event.job != job) return
+        val block = event.block
+        val ground = block.getRelative(BlockFace.DOWN).type
+        if (!Tag.LOGS.isTagged(block.type) || !Tag.DIRT.isTagged(ground)) return
+        if (!isEnabled(event.player)) return
+        val woodType = block.type.woodType()
+        val sapling = if (woodType == WoodType.OAK && ground == Material.ROOTED_DIRT) Material.AZALEA else SAPLINGS[woodType] ?: return
+        // まとめて壊しても予約するのは1tickに1回だけ
+        if (pending.isEmpty()) plugin.runNextTick { plantAll() }
+        pending += block to sapling.createBlockData()
+    }
+
+    private fun plantAll() {
+        for ((block, sapling) in pending) {
+            if (block.type.isAir && sapling.isSupported(block)) block.blockData = sapling
+        }
+        pending.clear()
+    }
+
+    private companion object {
+        val SAPLINGS = mapOf(
+            WoodType.OAK to Material.OAK_SAPLING,
+            WoodType.BIRCH to Material.BIRCH_SAPLING,
+            WoodType.SPRUCE to Material.SPRUCE_SAPLING,
+            WoodType.JUNGLE to Material.JUNGLE_SAPLING,
+            WoodType.ACACIA to Material.ACACIA_SAPLING,
+            WoodType.DARK_OAK to Material.DARK_OAK_SAPLING,
+            WoodType.PALE_OAK to Material.PALE_OAK_SAPLING,
+            WoodType.MANGROVE to Material.MANGROVE_PROPAGULE,
+            WoodType.CHERRY to Material.CHERRY_SAPLING,
+        )
     }
 }

@@ -7,6 +7,7 @@ import com.github.kotyabuchi.yurucra.skill.gathering.MultiBreak
 import com.github.kotyabuchi.yurucra.skill.gathering.TotemOfDemeter
 import com.github.kotyabuchi.yurucra.skill.gathering.TreeAssist
 import com.github.kotyabuchi.yurucra.skill.passive.Archaeologist
+import com.github.kotyabuchi.yurucra.skill.passive.AutoReplantSapling
 import com.github.kotyabuchi.yurucra.skill.passive.GemCollector
 import com.github.kotyabuchi.yurucra.skill.passive.HadesBlessing
 import com.github.kotyabuchi.yurucra.skill.passive.StoneReplacer
@@ -68,6 +69,7 @@ class Lumberjack(plugin: YuruCra) : GatheringJob(plugin, JobType.LUMBERJACK) {
         addExp(1, Material.entries.filter { it.isWood() })
 
         registerSkill(SkillCommand.LRL, TreeAssist(plugin, this))
+        registerPassiveSkill(AutoReplantSapling(plugin, this))
     }
 }
 
