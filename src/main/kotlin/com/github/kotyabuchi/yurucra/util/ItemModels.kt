@@ -29,6 +29,13 @@ enum class ItemModel(val id: String) {
     DEEPSLATE_SHOVEL("pumpking:deepslate_shovel"),
     DEEPSLATE_HOE("pumpking:deepslate_hoe"),
     DEEPSLATE_SWORD("pumpking:deepslate_sword"),
+
+    /** 材料別の狼の鎧（WOLF_ARMOR）に付ける */
+    COPPER_WOLF_ARMOR("pumpking:copper_wolf_armor"),
+    IRON_WOLF_ARMOR("pumpking:iron_wolf_armor"),
+    GOLDEN_WOLF_ARMOR("pumpking:golden_wolf_armor"),
+    DIAMOND_WOLF_ARMOR("pumpking:diamond_wolf_armor"),
+    NETHERITE_WOLF_ARMOR("pumpking:netherite_wolf_armor"),
 }
 
 fun ItemStack.withModel(model: ItemModel): ItemStack = apply {

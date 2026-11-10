@@ -19,6 +19,7 @@ import com.github.kotyabuchi.yurucra.feature.WorldProtection
 import com.github.kotyabuchi.yurucra.item.GlobalMending
 import com.github.kotyabuchi.yurucra.item.ItemDurability
 import com.github.kotyabuchi.yurucra.item.ItemIdentity
+import com.github.kotyabuchi.yurucra.item.WolfArmors
 import com.github.kotyabuchi.yurucra.job.JobProgress
 import com.github.kotyabuchi.yurucra.job.JobRegistry
 import com.github.kotyabuchi.yurucra.job.JobType
@@ -109,12 +110,13 @@ class YuruCra : JavaPlugin() {
         listOf(skeletons, spiders, witches).forEach { fights.register(it) }
 
         val itemDurability = ItemDurability(this)
+        val wolfArmors = WolfArmors(this, itemDurability).also { it.register() }
 
         registerListeners(
             players, resourceStorage, breakContext, placedBlocks, safeCrop, menus, tombStones, resourcePacks,
             chestSort, damagePopup, utilityRecipes,
             fights, skeletons, spiders, witches, explosions, HelmetMobs(),
-            ItemIdentity(this), itemDurability, GlobalMending(itemDurability),
+            ItemIdentity(this), itemDurability, GlobalMending(itemDurability), wolfArmors,
             SkillCaster(this), MenuCompass(this),
             // 便利機能
             Elevator(), WorldProtection(), StoneGenerator(this), SpawnerUpgrade(),

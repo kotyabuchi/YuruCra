@@ -119,14 +119,15 @@ class ItemDurability(private val plugin: Plugin) : Listener {
 
     /** 最大耐久値をエンチャントなどに合わせ直し（残りの割合は保つ）、説明文を更新する */
     private fun sync(item: ItemStack) {
-        val base = item.type.maxDurability.toInt()
+        // 材料別の狼の鎧は、その材料の耐久値が基準
+        val base = WolfArmorTier.of(item)?.durability ?: item.type.maxDurability.toInt()
         val expected = expectedMax(item, base)
         val current = item.getData(DataComponentTypes.MAX_DAMAGE) ?: base
         var damage = item.getData(DataComponentTypes.DAMAGE) ?: 0
         if (current != expected) {
             val ratio = (current - damage).toDouble() / current
             damage = (expected - (expected * ratio).roundToInt()).coerceIn(0, expected - 1)
-            if (expected == base) item.resetData(DataComponentTypes.MAX_DAMAGE) else item.setData(DataComponentTypes.MAX_DAMAGE, expected)
+            if (expected == item.type.maxDurability.toInt()) item.resetData(DataComponentTypes.MAX_DAMAGE) else item.setData(DataComponentTypes.MAX_DAMAGE, expected)
             item.setData(DataComponentTypes.DAMAGE, damage)
         }
         updateLore(item, expected - damage, expected)
