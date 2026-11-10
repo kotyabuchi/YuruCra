@@ -3,5 +3,10 @@
   "item.yurucra.deepslate_axe": "深層岩の斧",
   "item.yurucra.deepslate_shovel": "深層岩のシャベル",
   "item.yurucra.deepslate_hoe": "深層岩のクワ",
-  "item.yurucra.deepslate_sword": "深層岩の剣"
+  "item.yurucra.deepslate_sword": "深層岩の剣",
+  "item.yurucra.copper_wolf_armor": "銅のオオカミの鎧",
+  "item.yurucra.iron_wolf_armor": "鉄のオオカミの鎧",
+  "item.yurucra.golden_wolf_armor": "金のオオカミの鎧",
+  "item.yurucra.diamond_wolf_armor": "ダイヤモンドのオオカミの鎧",
+  "item.yurucra.netherite_wolf_armor": "ネザライトのオオカミの鎧"
 }
